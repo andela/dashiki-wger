@@ -316,7 +316,7 @@ THUMBNAIL_ALIASES = {
 #
 
 
-STATIC_URL = os.environ.get("STATIC_URL", "/wger/core/static")
+STATIC_URL = os.environ.get("STATIC_URL", "/wger/core/static/")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static-collected')
 
