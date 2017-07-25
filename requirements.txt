@@ -20,6 +20,7 @@ djangorestframework==3.2.5
 docutils==0.13.1
 easy-thumbnails==2.4.1
 flake8==3.3.0
+gunicorn==19.7.1
 html5lib==0.999999999
 icalendar==3.11.5
 idna==2.5
