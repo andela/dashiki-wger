@@ -5,6 +5,8 @@ import warnings
 
 from wger.settings_global import *
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Use 'DEBUG = True' to get more details for server errors
 DEBUG = os.environ.get("DEBUG") or True
 TEMPLATES[0]['OPTIONS']['debug'] = True
@@ -14,19 +16,9 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
-DATABASES = {
-    'default': {
-        'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     'wger',
-        'USER':     'postgres',
-        'PASSWORD': '',
-        'TEST': {'CHARSET': 'UTF8'}
-    }
-}
-
-# Update database configuration with $DATABASE_URL.
+DATABASES = {}
 db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+DATABASES['default'] = db_from_env
 
 
 # DATABASES['default'] =  dj_database_url.config(default='postgres://foo:bar@somehost.amazonaws.com:5432/somedb')

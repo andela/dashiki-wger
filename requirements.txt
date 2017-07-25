@@ -48,3 +48,4 @@ Sphinx==1.6.3
 sphinxcontrib-websupport==1.0.1
 urllib3==1.21.1
 webencodings==0.5.1
+whitenoise==3.3.0
