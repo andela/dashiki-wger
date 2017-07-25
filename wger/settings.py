@@ -4,7 +4,7 @@
 from wger.settings_global import *
 
 # Use 'DEBUG = True' to get more details for server errors
-DEBUG = True
+DEBUG = os.environ.get("DEBUG") or True
 TEMPLATES[0]['OPTIONS']['debug'] = True
 
 ADMINS = (
@@ -25,22 +25,22 @@ DATABASES = {
 }
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '2vhrp=0n5y#1kns*c)foi%d98qr#yn#3+=bm+c29qzkfu7ai(5'
+SECRET_KEY = os.environ.get("SECRET_KEY", "2vhrp=0n5y#1kns*c)foi%d98qr#yn#3+=bm+c29qzkfu7ai(5")
 
 # Your reCaptcha keys
-RECAPTCHA_PUBLIC_KEY = ''
-RECAPTCHA_PRIVATE_KEY = ''
-NOCAPTCHA = True
+RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY", "")
+RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY", "")
+NOCAPTCHA = os.environ.get("NOCAPTCHA", True)
 
 # The site's URL (e.g. http://www.my-local-gym.com or http://localhost:8000)
 # This is needed for uploaded files and images (exercise images, etc.) to be
 # properly served.
-SITE_URL = 'http://localhost:8000'
+SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")
 
 # Path to uploaded files
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT = '/Users/edwinkato/.local/share/wger/media'
-MEDIA_URL = '/media/'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Allow all hosts to access the application. Change if used in production.
 ALLOWED_HOSTS = '*'
