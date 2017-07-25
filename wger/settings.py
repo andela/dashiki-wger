@@ -15,10 +15,12 @@ ADMINS = (
 MANAGERS = ADMINS
 
 
-
 DATABASES = {}
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'] = db_from_env
+
+
+# DATABASES['default'] =  dj_database_url.config(default='postgres://foo:bar@somehost.amazonaws.com:5432/somedb')
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = os.environ.get("SECRET_KEY", "2vhrp=0n5y#1kns*c)foi%d98qr#yn#3+=bm+c29qzkfu7ai(5")

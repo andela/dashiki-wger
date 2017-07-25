@@ -16,6 +16,6 @@ if __name__ == "__main__":
     #     setup_django_environment(get_user_config_path('wger', 'settings.py'))
 
     # Alternative to above
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "wger.settings")
 
     execute_from_command_line(sys.argv)
