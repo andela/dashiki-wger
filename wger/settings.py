@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import dj_database_url
+import warnings
 
 from wger.settings_global import *
 
@@ -13,16 +15,10 @@ ADMINS = (
 MANAGERS = ADMINS
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/Volumes/the_dark_knight/Projects/Python/dashiki-wger/wger/database.sqlite',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-    }
-}
+
+DATABASES = {}
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'] = db_from_env
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = os.environ.get("SECRET_KEY", "2vhrp=0n5y#1kns*c)foi%d98qr#yn#3+=bm+c29qzkfu7ai(5")
@@ -57,3 +53,8 @@ WGER_SETTINGS['EMAIL_FROM'] = 'wger Workout Manager <wger@example.com>'
 
 # Your twitter handle, if you have one for this instance.
 #WGER_SETTINGS['TWITTER'] = ''
+
+if os.path.exists(os.path.join(BASE_DIR, "wger/local_settings.py")):
+    from .local_settings import *
+else:
+    warnings.warn("local_settings.py not found, using defaults")

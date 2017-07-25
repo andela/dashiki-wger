@@ -64,3 +64,5 @@ node_modules
 
 wger-venv/
 package-lock.json
+# Local settings
+wger/local_settings.py
