@@ -108,8 +108,8 @@ class GymUserListView(LoginRequiredMixin,
         out = {'admins': [],
                'members': []}
 
-        for u in Gym.objects.get_members(
-                    self.kwargs['pk']).select_related('usercache'):
+        for u in Gym.objects.get_members(self.kwargs['pk']).\
+                select_related('usercache'):
             out['members'].append({'obj': u,
                                    'last_log': u.usercache.last_activity})
 
@@ -121,7 +121,7 @@ class GymUserListView(LoginRequiredMixin,
                           'manage_gyms': u.has_perm('gym.manage_gyms'),
                           'gym_trainer': u.has_perm('gym.gym_trainer'),
                           'any_admin': is_any_gym_admin(u)}
-                })
+            })
         return out
 
     def get_context_data(self, **kwargs):
