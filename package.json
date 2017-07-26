@@ -1,6 +1,9 @@
 {
   "name": "wger",
   "version": "1.8.0",
+  "engines": {
+    "node": "6.11.1"
+  },
   "description": "Self hosted FLOSS fitness/workout and weight tracker",
   "directories": {
     "doc": "docs"
