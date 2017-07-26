@@ -328,12 +328,6 @@ COMPRESS_CSS_FILTERS = (
 )
 COMPRESS_ROOT = STATIC_ROOT
 
-# BOWER binary
-if sys.platform.startswith('win32'):
-    BOWER_PATH = os.path.join('node_modules', '.bin', 'bower.cmd')
-else:
-    BOWER_PATH = os.path.join('node_modules', '.bin', 'bower')
-
 #
 # Django Rest Framework
 #

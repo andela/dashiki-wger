@@ -60,6 +60,7 @@ target/
 
 # External Libraries
 wger/core/static/bower_components
+wger/components
 node_modules
 
 wger-venv/

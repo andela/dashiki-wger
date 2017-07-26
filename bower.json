@@ -1,0 +1,29 @@
+{
+  "name": "wger",
+  "description": "Self hosted FLOSS fitness/workout and weight tracker",
+  "main": "",
+  "authors": [
+    "Edwin Kato <edwin.kato@andela.com>"
+  ],
+  "license": "AGPL-3.0",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "wger/core/static/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "components-font-awesome": "^4.7.0",
+    "bootstrap": "^3.3.7",
+    "datatables": "DataTables#^1.10.15",
+    "devbridge-autocomplete": "1.2.x",
+    "metrics-graphics": "^2.11.0",
+    "shariff": "^1.25.2",
+    "jquery": "2.1.x",
+    "Sortable": "sortablejs#1.4.x",
+    "tinymce": "tinymce-dist#^4.6.4"
+  }
+}
