@@ -69,6 +69,16 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         user = self.get_object().user
         return Response(UsernameSerializer(user).data)
 
+    def create(self, request, *args, **kwargs):
+        if self.request.user.can_create_via_api:
+            response = super(UserProfileViewSet, self).create(request, *args, **kwargs)
+            user = User.objects.get(id=response.data.get('id'))
+            user.app_flag = user.username
+            user.save()
+            return Response(status=200, message="User created successfully")
+        else:
+            return Response(status=409, message="Cannot create user via API");
+
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     '''
