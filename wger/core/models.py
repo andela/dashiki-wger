@@ -123,7 +123,7 @@ class UserProfile(models.Model):
     Flag to mark a temporary user (demo account)
     '''
 
-    can_create_via_api = models.BooleanField(default=False)
+    can_create_via_api = models.BooleanField(default=False, editable=False)
     '''
     Shows whether the app was created via the api or not
     '''
