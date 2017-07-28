@@ -128,7 +128,7 @@ class UserProfile(models.Model):
     Shows whether the app was created via the api or not
     '''
 
-    app_flag = models.CharField(default=None)
+    app_flag = models.CharField(default=None, null=True, max_length=255)
     '''
     Flag to indicate which app created the user
     '''
