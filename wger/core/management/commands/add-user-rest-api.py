@@ -37,8 +37,7 @@ class Command(BaseCommand):
         user = User.object.filter(username=options["username"])
         if user:
             user.can_create_via_api = True
+
             user.save()
         else:
             return "Could not find user"
-            
-
