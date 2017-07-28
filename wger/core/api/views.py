@@ -77,7 +77,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             user.save()
             return Response(status=200, message="User created successfully")
         else:
-            return Response(status=409, message="Cannot create user via API");
+            return Response(status=409, message="Cannot create user via API")
 
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
