@@ -45,6 +45,7 @@ coverage.xml
 *.pot
 
 # Django stuff:
+settings*.py
 *.log
 *.sqlite
 /CACHE
@@ -65,5 +66,3 @@ node_modules
 
 wger-venv/
 package-lock.json
-# Local settings
-wger/local_settings.py
