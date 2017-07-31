@@ -16,7 +16,7 @@
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.contrib.auth.models import User
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 
@@ -33,10 +33,30 @@ from wger.core.api.serializers import (
     DaysOfWeekSerializer,
     LicenseSerializer,
     RepetitionUnitSerializer,
-    WeightUnitSerializer
+    WeightUnitSerializer,
+    UserCreationSerializer
 )
 from wger.core.api.serializers import UserprofileSerializer
 from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
+
+class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = UserCreationSerializer
+    queryset = User.objects.all()
+
+    def create(self, request):
+        if self.request.user.profile.can_create_via_api:
+            creator = self.request.user.username
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                user = User.objects.create_user(username=serializer.validated_data['username'],
+                                                email=serializer.validated_data['email'],
+                                                password=serializer.validated_data['password'])
+                user.save()
+                profile = user.profile
+                profile.app_flag = creator
+                profile.save()
+                return Response(serializer.data, status.HTTP_201_CREATED)
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -69,15 +89,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         user = self.get_object().user
         return Response(UsernameSerializer(user).data)
 
-    def create(self, request, *args, **kwargs):
-        if self.request.user.can_create_via_api:
-            response = super(UserProfileViewSet, self).create(request, *args, **kwargs)
-            user = User.objects.get(id=response.data.get('id'))
-            user.app_flag = user.username
-            user.save()
-            return Response(status=200, message="User created successfully")
-        else:
-            return Response(status=409, message="Cannot create user via API")
 
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
