@@ -22,7 +22,8 @@ import bleach
 
 from django.db import models
 from django.template.loader import render_to_string
-from django.template.defaultfilters import slugify  # django.utils.text.slugify in django 1.5!
+from django.template.defaultfilters import slugify
+# django.utils.text.slugify in django 1.5!
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
@@ -141,7 +142,8 @@ class ExerciseCategory(models.Model):
         # Cached template fragments
         for language in Language.objects.all():
             delete_template_fragment_cache('exercise-overview', language.id)
-            delete_template_fragment_cache('exercise-overview-mobile', language.id)
+            delete_template_fragment_cache('exercise-overview-mobile',
+                                           language.id)
 
     def delete(self, *args, **kwargs):
         '''
@@ -149,7 +151,8 @@ class ExerciseCategory(models.Model):
         '''
         for language in Language.objects.all():
             delete_template_fragment_cache('exercise-overview', language.id)
-            delete_template_fragment_cache('exercise-overview-mobile', language.id)
+            delete_template_fragment_cache('exercise-overview-mobile',
+                                           language.id)
 
         super(ExerciseCategory, self).delete(*args, **kwargs)
 
@@ -184,10 +187,11 @@ class Exercise(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
                                      verbose_name=_('Primary muscles'))
     '''Main muscles trained by the exercise'''
 
-    muscles_secondary = models.ManyToManyField(Muscle,
-                                               verbose_name=_('Secondary muscles'),
-                                               related_name='secondary_muscles',
-                                               blank=True)
+    muscles_secondary = models.ManyToManyField(
+        Muscle,
+        verbose_name=_('Secondary muscles'),
+        related_name='secondary_muscles',
+        blank=True)
     '''Secondary muscles trained by the exercise'''
 
     equipment = models.ManyToManyField(Equipment,
@@ -223,7 +227,8 @@ class Exercise(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
         '''
         Returns the canonical URL to view an exercise
         '''
-        return reverse('exercise:exercise:view', kwargs={'id': self.id, 'slug': slugify(self.name)})
+        return reverse('exercise:exercise:view',
+                       kwargs={'id': self.id, 'slug': slugify(self.name)})
 
     def save(self, *args, **kwargs):
         '''
@@ -239,7 +244,8 @@ class Exercise(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
         for language in Language.objects.all():
             delete_template_fragment_cache('muscle-overview', language.id)
             delete_template_fragment_cache('exercise-overview', language.id)
-            delete_template_fragment_cache('exercise-overview-mobile', language.id)
+            delete_template_fragment_cache('exercise-overview-mobile',
+                                           language.id)
             delete_template_fragment_cache('equipment-overview', language.id)
 
         # Cached workouts
@@ -258,7 +264,8 @@ class Exercise(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
         for language in Language.objects.all():
             delete_template_fragment_cache('muscle-overview', language.id)
             delete_template_fragment_cache('exercise-overview', language.id)
-            delete_template_fragment_cache('exercise-overview-mobile', language.id)
+            delete_template_fragment_cache('exercise-overview-mobile',
+                                           language.id)
             delete_template_fragment_cache('equipment-overview', language.id)
 
         # Cached workouts
@@ -307,9 +314,11 @@ class Exercise(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
         except User.DoesNotExist:
             return
         if self.license_author and user.email:
-            translation.activate(user.userprofile.notification_language.short_name)
+            translation.activate(
+                user.userprofile.notification_language.short_name)
             url = request.build_absolute_uri(self.get_absolute_url())
-            subject = _('Exercise was successfully added to the general database')
+            subject = _('Exercise was successfully'
+                        ' added to the general database')
             context = {
                 'exercise': self.name,
                 'url': url,
@@ -337,7 +346,8 @@ class Exercise(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
                 self.license_author = request.user.username
 
             subject = _('New user submitted exercise')
-            message = _(u'The user {0} submitted a new exercise "{1}".').format(
+            message = _(u'The user {0} submitted '
+                        u'a new exercise "{1}".').format(
                 request.user.username, self.name)
             mail.mail_admins(six.text_type(subject),
                              six.text_type(message),
@@ -351,7 +361,8 @@ def exercise_image_upload_dir(instance, filename):
     return "exercise-images/{0}/{1}".format(instance.exercise.id, filename)
 
 
-class ExerciseImage(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
+class ExerciseImage(AbstractSubmissionModel,
+                    AbstractLicenseModel, models.Model):
     '''
     Model for an exercise image
     '''
@@ -364,15 +375,19 @@ class ExerciseImage(AbstractSubmissionModel, AbstractLicenseModel, models.Model)
     '''The exercise the image belongs to'''
 
     image = models.ImageField(verbose_name=_('Image'),
-                              help_text=_('Only PNG and JPEG formats are supported'),
+                              help_text=_('Only PNG and'
+                                          ' JPEG formats are supported'),
                               upload_to=exercise_image_upload_dir)
     '''Uploaded image'''
 
     is_main = models.BooleanField(verbose_name=_('Main picture'),
                                   default=False,
-                                  help_text=_("Tick the box if you want to set this image as the "
-                                              "main one for the exercise (will be shown e.g. in "
-                                              "the search). The first image is automatically "
+                                  help_text=_("Tick the box if you want"
+                                              " to set this image as the "
+                                              "main one for the exercise"
+                                              " (will be shown e.g. in "
+                                              "the search). The first"
+                                              " image is automatically "
                                               "marked by the system."))
     '''A flag indicating whether the image is the exercise's main image'''
 
@@ -387,13 +402,15 @@ class ExerciseImage(AbstractSubmissionModel, AbstractLicenseModel, models.Model)
         Only one image can be marked as main picture at a time
         '''
         if self.is_main:
-            ExerciseImage.objects.filter(exercise=self.exercise).update(is_main=False)
+            ExerciseImage.objects.filter(exercise=self.exercise)\
+                .update(is_main=False)
             self.is_main = True
         else:
-            if ExerciseImage.objects.accepted().filter(exercise=self.exercise).count() == 0 \
+            if ExerciseImage.objects.accepted()\
+                .filter(exercise=self.exercise).count() == 0 \
                or not ExerciseImage.objects.accepted() \
-                            .filter(exercise=self.exercise, is_main=True)\
-                            .count():
+                .filter(exercise=self.exercise, is_main=True)\
+                    .count():
                 self.is_main = True
 
         #
@@ -402,7 +419,8 @@ class ExerciseImage(AbstractSubmissionModel, AbstractLicenseModel, models.Model)
         for language in Language.objects.all():
             delete_template_fragment_cache('muscle-overview', language.id)
             delete_template_fragment_cache('exercise-overview', language.id)
-            delete_template_fragment_cache('exercise-overview-mobile', language.id)
+            delete_template_fragment_cache('exercise-overview-mobile',
+                                           language.id)
             delete_template_fragment_cache('equipment-overview', language.id)
 
         # And go on
@@ -417,7 +435,8 @@ class ExerciseImage(AbstractSubmissionModel, AbstractLicenseModel, models.Model)
         for language in Language.objects.all():
             delete_template_fragment_cache('muscle-overview', language.id)
             delete_template_fragment_cache('exercise-overview', language.id)
-            delete_template_fragment_cache('exercise-overview-mobile', language.id)
+            delete_template_fragment_cache('exercise-overview-mobile',
+                                           language.id)
             delete_template_fragment_cache('equipment-overview', language.id)
 
         # Make sure there is always a main image
@@ -455,7 +474,8 @@ class ExerciseImage(AbstractSubmissionModel, AbstractLicenseModel, models.Model)
                 self.license_author = request.user.username
 
             subject = _('New user submitted image')
-            message = _(u'The user {0} submitted a new image "{1}" for exercise {2}.').format(
+            message = _(u'The user {0} submitted a new image "{1}"'
+                        u' for exercise {2}.').format(
                 request.user.username,
                 self.name,
                 self.exercise)
@@ -474,7 +494,8 @@ class ExerciseComment(models.Model):
                                  editable=False)
     comment = models.CharField(max_length=200,
                                verbose_name=_('Comment'),
-                               help_text=_('A comment about how to correctly do this exercise.'))
+                               help_text=_('A comment about how to'
+                                           ' correctly do this exercise.'))
 
     def __str__(self):
         '''
