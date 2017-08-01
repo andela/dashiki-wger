@@ -83,6 +83,7 @@ class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, L
     Overview of all users for a specific gym
     '''
     model = User
+    active = True
     permission_required = ('gym.manage_gym', 'gym.gym_trainer', 'gym.manage_gyms')
     template_name = 'gym/member_list.html'
 
@@ -104,7 +105,7 @@ class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, L
         out = {'admins': [],
                'members': []}
 
-        for u in Gym.objects.get_members(self.kwargs['pk']).select_related('usercache'):
+        for u in Gym.objects.get_members(self.kwargs['pk'], active=self.active).select_related('usercache'):
             out['members'].append({'obj': u,
                                    'last_log': u.usercache.last_activity})
 
