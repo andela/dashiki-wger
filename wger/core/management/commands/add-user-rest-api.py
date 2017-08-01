@@ -14,7 +14,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 
-from django.utils.timezone import now
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from wger.core.models import UserProfile
@@ -27,17 +26,21 @@ class Command(BaseCommand):
 
     help = 'Give user permission to create users'
 
-    def add_argument(self, parser):
-        parser.add_argument('username')
-        parser.add_argument('email')
-        parser.add_argument('app')
+    def add_arguments(self, parser):
+        parser.add_argument('username', nargs='?', type=str)
 
     def handle(self, *args, **options):
         # check if user exists
-        user = User.object.filter(username=options["username"])
-        if user:
-            user.can_create_via_api = True
+        username = options.get('username', None)
+        try:
+            user = User.objects.get(username=username)
 
-            user.save()
-        else:
+            profile = UserProfile.objects.get(user=user)
+            if profile.can_create_via_api:
+                return 'User already has permission to create users'
+            else:
+                profile.can_create_via_api = True
+            profile.save()
+            return 'Successfully gave the user permission to create users'
+        except:
             return "Could not find user"
