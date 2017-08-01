@@ -39,6 +39,7 @@ from wger.core.api.serializers import (
 from wger.core.api.serializers import UserprofileSerializer
 from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
 
+
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserCreationSerializer
     queryset = User.objects.all()
@@ -88,7 +89,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
         user = self.get_object().user
         return Response(UsernameSerializer(user).data)
-
 
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
