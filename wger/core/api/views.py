@@ -45,7 +45,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
 
     def create(self, request):
-        if self.request.user.profile.can_create_via_api:
+        user = User.objects.get(user_id=request.user_id)
+        if user.profile.can_create_via_api:
             creator = self.request.user.username
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
