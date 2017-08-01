@@ -20,6 +20,8 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 
+from json import loads
+
 from wger.core.models import (
     UserProfile,
     Language,
@@ -45,8 +47,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
 
     def create(self, request):
-        user = User.objects.get(user_id=request.user_id)
-        if user.profile.can_create_via_api:
+        user = User.objects.get(id=loads(request.body)['user_id'])
+        if user.userprofile.can_create_via_api:
             creator = self.request.user.username
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
@@ -54,7 +56,7 @@ class UserViewSet(viewsets.ModelViewSet):
                                                 email=serializer.validated_data['email'],
                                                 password=serializer.validated_data['password'])
                 user.save()
-                profile = user.profile
+                profile = user.userprofile
                 profile.app_flag = creator
                 profile.save()
                 return Response(serializer.data, status.HTTP_201_CREATED)
