@@ -26,4 +26,5 @@ class NutritionSitemap(Sitemap):
 
     def items(self):
         return (Ingredient.objects.filter(language=load_language())
-                                  .filter(status__in=Ingredient.INGREDIENT_STATUS_OK))
+                                  .filter(status__in=Ingredient.
+                                          INGREDIENT_STATUS_OK))
