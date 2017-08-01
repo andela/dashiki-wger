@@ -26,9 +26,14 @@ class ApiUserTestCase(WorkoutManagerTestCase):
     '''
      Test API user creation
     '''
-
-    def setUp(self):
-        user = User.objects.create_user(username='Charles Oduk')
+    def test_create_user_via_api(self):
+        '''
+        Tests the creation of a user via the API
+        '''
+        user = User.objects.create_user(
+            username='Charles Oduk',
+            email='email@oduk.com',
+            password='password')
         user.save()
         profile = UserProfile.objects.get(user=user)
         profile.can_create_via_api = True
@@ -41,12 +46,8 @@ class ApiUserTestCase(WorkoutManagerTestCase):
             'password': 'password'
         }
 
-    def test_create_user_via_api(self):
-        '''
-        Tests the creation of a user via the API
-        '''
         response = self.client.post(
-            reverse('core:user:usercreation'),
+            '/api/v2/usercreation/',
             data=json.dumps(self.payload),
             content_type='application/json'
         )
