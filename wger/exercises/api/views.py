@@ -68,6 +68,7 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     '''
     API endpoint for exercise objects
     '''
+    model = Exercise
     queryset = Exercise.objects.all()
     serializer_class = ExerciseSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, CreateOnlyPermission)
@@ -78,6 +79,9 @@ class ExerciseViewSet(viewsets.ModelViewSet):
         # if ?detail=all in query string
         if self.request.GET.get('detail') == 'all':
             self.serializer_class = DetailedExerciseSerializer
+
+        if self.request.GET.get('id') is not None:
+            self.queryset = Exercise.objects.filter(id=int(self.request.GET.get('id')))
         return self.queryset
 
     def perform_create(self, serializer):
