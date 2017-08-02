@@ -48,7 +48,7 @@ from wger.utils.permissions import CreateOnlyPermission
 
 
 class Shared:
-    
+
     @staticmethod
     def exercise_filter_fileds():
         return ('category',
