@@ -47,7 +47,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
 
     def create(self, request):
-        user = User.objects.get(id=str(loads(request.body)['user_id']))
+        user = User.objects.get(id=str(loads(request.body.decode())['user_id']))
         profile = UserProfile.objects.get(user=user)
         if profile.can_create_via_api:
             creator = user.username
