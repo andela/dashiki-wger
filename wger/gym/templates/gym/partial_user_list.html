@@ -14,10 +14,12 @@ $(document).ready( function () {
 });
 </script>
 
-{% if active %}
-    <a href="{% url 'gym:gym:user-list-inactive' gym_id %}" class="btn btn-default btn-sm">Inactive Users</a>
-{% else %}
-    <a href="{% url 'gym:gym:user-list' gym_id %}" class="btn btn-default btn-sm">Active Users</a>
+{% if not show_gym %}
+    {% if active %}
+        <a href="{% url 'gym:gym:user-list-inactive' gym_id %}" class="btn btn-default btn-sm">Inactive Users</a>
+    {% else %}
+        <a href="{% url 'gym:gym:user-list' gym_id %}" class="btn btn-default btn-sm">Active Users</a>
+    {% endif %}
 {% endif %}
 
 <table class="table table-hover" id="main_member_list">

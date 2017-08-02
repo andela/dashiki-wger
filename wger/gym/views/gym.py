@@ -125,6 +125,8 @@ class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, L
         '''
         context = super(GymUserListView, self).get_context_data(**kwargs)
         context['gym'] = Gym.objects.get(pk=self.kwargs['pk'])
+        context['gym_id'] = self.kwargs['pk']
+        context['active'] = self.active
         context['admin_count'] = len(context['object_list']['admins'])
         context['user_count'] = len(context['object_list']['members'])
         context['user_table'] = {'keys': [_('ID'), _('Username'), _('Name'), _('Last activity')],
