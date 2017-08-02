@@ -80,9 +80,14 @@ class DetailedExerciseSerializer(serializers.ModelSerializer):
     '''
     equipment = EquipmentSerializer(many=True)
     muscles, muscles_secondary = MuscleSerializer(many=True), MuscleSerializer(many=True)
+    images = serializers.SerializerMethodField('get_exercise_images') 
     category = ExerciseCategorySerializer()
     license = LicenseSerializer()
     language = LanguageSerializer()
+
+    def get_exercise_images(self, obj):
+        img_query = ExerciseImage.objects.filter(id=obj.id).all()
+        return ExerciseSerializer(instance=img_query, many=True).data
 
     class Meta:
         model = Exercise
