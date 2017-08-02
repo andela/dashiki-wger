@@ -86,7 +86,7 @@ class DetailedExerciseSerializer(serializers.ModelSerializer):
     language = LanguageSerializer()
 
     def get_exercise_images(self, obj):
-        img_query = ExerciseImage.objects.filter(id=obj.id).all()
+        img_query = ExerciseImage.objects.filter(exercise_id=obj.id).all()
         return ExerciseSerializer(instance=img_query, many=True).data
 
     class Meta:
