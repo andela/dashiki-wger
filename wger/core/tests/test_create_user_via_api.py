@@ -16,7 +16,6 @@ import json
 from rest_framework import status
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from wger.core.models import UserProfile
 
 from wger.core.tests.base_testcase import WorkoutManagerTestCase
@@ -26,12 +25,13 @@ class ApiUserTestCase(WorkoutManagerTestCase):
     '''
      Test API user creation
     '''
+
     def test_create_user_via_api(self):
         '''
         Tests the creation of a user via the API
         '''
         user = User.objects.create_user(
-            username='Charles Oduk',
+            username='FitnessFirst',
             email='email@oduk.com',
             password='password')
         user.save()
@@ -51,5 +51,8 @@ class ApiUserTestCase(WorkoutManagerTestCase):
             data=json.dumps(self.payload),
             content_type='application/json'
         )
+        donna = User.objects.get(username='DonnaMwiine')
+        donnaProfile = UserProfile.objects.get(user=donna)
 
+        self.assertEqual(donnaProfile.app_flag, 'FitnessFirst')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
