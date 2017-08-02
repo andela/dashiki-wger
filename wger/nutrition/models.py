@@ -377,7 +377,7 @@ class Ingredient(AbstractLicenseModel, models.Model):
         # Compare the values, but be generous
         if self.energy:
             energy_upper = self.energy * \
-                           (1 + (self.ENERGY_APPROXIMATION / Decimal(100.0)))
+                (1 + (self.ENERGY_APPROXIMATION / Decimal(100.0)))
             energy_lower = self.energy * \
                 (1 - (self.ENERGY_APPROXIMATION / Decimal(100.0)))
 
