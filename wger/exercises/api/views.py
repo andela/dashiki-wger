@@ -81,7 +81,8 @@ class ExerciseViewSet(viewsets.ModelViewSet):
             self.serializer_class = DetailedExerciseSerializer
 
         if self.request.GET.get('id') is not None:
-            self.queryset = Exercise.objects.filter(id=int(self.request.GET.get('id')))
+            self.queryset = Exercise.objects.filter(
+                id=int(self.request.GET.get('id')))
         return self.queryset
 
     def perform_create(self, serializer):

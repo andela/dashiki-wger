@@ -79,7 +79,8 @@ class DetailedExerciseSerializer(serializers.ModelSerializer):
     Exercises with detail
     '''
     equipment = EquipmentSerializer(many=True)
-    muscles, muscles_secondary = MuscleSerializer(many=True), MuscleSerializer(many=True)
+    muscles, muscles_secondary = MuscleSerializer(
+        many=True), MuscleSerializer(many=True)
     images = serializers.SerializerMethodField('get_exercise_images')
     category = ExerciseCategorySerializer()
     license = LicenseSerializer()
