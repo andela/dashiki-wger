@@ -47,18 +47,22 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
 
     def create(self, request):
-        user = User.objects.get(id=loads(request.body.decode())['user_id'])
-        if user.userprofile.can_create_via_api:
-            creator = self.request.user.username
+
+        user = User.objects.get(id=str(loads(request.body.decode())['user_id']))
+        profile = UserProfile.objects.get(user=user)
+        if profile.can_create_via_api:
+            creator = user.username
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
-                user = User.objects.create_user(username=serializer.validated_data['username'],
-                                                email=serializer.validated_data['email'],
-                                                password=serializer.validated_data['password'])
-                user.save()
-                profile = user.userprofile
-                profile.app_flag = creator
-                profile.save()
+                api_user = User.objects.create_user(
+                    username=serializer.validated_data['username'],
+                    email=serializer.validated_data['email'],
+                    password=serializer.validated_data['password'])
+
+                api_user.save()
+                api_user_profile = UserProfile.objects.get(user=api_user)
+                api_user_profile.app_flag = creator
+                api_user_profile.save()
                 return Response(serializer.data, status.HTTP_201_CREATED)
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 

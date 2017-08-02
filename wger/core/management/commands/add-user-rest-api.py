@@ -40,7 +40,7 @@ class Command(BaseCommand):
                 return 'User already has permission to create users'
             else:
                 profile.can_create_via_api = True
-            profile.save()
-            return 'Successfully gave the user permission to create users'
+                profile.save()
+                return 'Successfully gave the user permission to create users'
         except:
             return "Could not find user"
