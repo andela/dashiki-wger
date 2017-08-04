@@ -69,8 +69,9 @@ class MealSerializer(serializers.ModelSerializer):
     '''
     Meal serializer
     '''
-    plan = serializers.PrimaryKeyRelatedField(label='Nutrition plan',
-                                              queryset=NutritionPlan.objects.all())
+    plan = serializers.PrimaryKeyRelatedField(
+        label='Nutrition plan',
+        queryset=NutritionPlan.objects.all())
 
     class Meta:
         model = Meal
