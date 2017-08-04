@@ -71,9 +71,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
         Calculates the nutritional values for current ingredient and
         the given amount and unit.
 
-        This function basically just performs a multiplication (in the model), and
-        is a candidate to be moved to pure AJAX calls, however doing it like this
-        keeps the logic nicely hidden and respects the DRY principle.
+        This function basically just performs a multiplication (in the model),
+        and is a candidate to be moved to pure AJAX calls, however doing it
+        like this keeps the logic nicely hidden and respects the DRY principle.
         '''
 
         result = {
@@ -126,9 +126,10 @@ def search(request):
     json_response = {}
     if q:
         languages = load_ingredient_languages(request)
-        ingredients = Ingredient.objects.filter(name__icontains=q,
-                                                language__in=languages,
-                                                status__in=Ingredient.INGREDIENT_STATUS_OK)
+        ingredients = Ingredient.objects.filter(
+            name__icontains=q,
+            language__in=languages,
+            status__in=Ingredient.INGREDIENT_STATUS_OK)
 
         for ingredient in ingredients:
             ingredient_json = {
@@ -197,7 +198,8 @@ class NutritionPlanViewSet(viewsets.ModelViewSet):
         '''
         Return an overview of the nutritional plan's values
         '''
-        return Response(NutritionPlan.objects.get(pk=pk).get_nutritional_values())
+        return Response(NutritionPlan.objects.
+                        get(pk=pk).get_nutritional_values())
 
 
 class MealViewSet(WgerOwnerObjectModelViewSet):

@@ -102,13 +102,16 @@ class DailyCaloriesForm(forms.ModelForm):
     '''
 
     base_calories = forms.IntegerField(label=_('Basic caloric intake'),
-                                       help_text=_('Your basic caloric intake as calculated for '
+                                       help_text=_('Your basic caloric intake'
+                                                   'as calculated for '
                                                    'your data'),
                                        required=False,
                                        widget=Html5NumberInput())
     additional_calories = forms.IntegerField(label=_('Additional calories'),
-                                             help_text=_('Additional calories to add to the base '
-                                                         'rate (to substract, enter a negative '
+                                             help_text=_('Additional calories'
+                                                         'to add to the base '
+                                                         'rate (to subtract,'
+                                                         ' enter a negative '
                                                          'number)'),
                                              initial=0,
                                              required=False,
@@ -120,9 +123,10 @@ class DailyCaloriesForm(forms.ModelForm):
 
 
 class MealItemForm(forms.ModelForm):
-    weight_unit = forms.ModelChoiceField(queryset=IngredientWeightUnit.objects.none(),
-                                         empty_label="g",
-                                         required=False)
+    weight_unit = forms.ModelChoiceField(
+        queryset=IngredientWeightUnit.objects.none(),
+        empty_label="g",
+        required=False)
     ingredient = forms.ModelChoiceField(queryset=Ingredient.objects.all(),
                                         widget=forms.HiddenInput)
 
@@ -145,4 +149,5 @@ class MealItemForm(forms.ModelForm):
         # Filter the available ingredients
         if ingredient_id:
             self.fields['weight_unit'].queryset = \
-                IngredientWeightUnit.objects.filter(ingredient_id=ingredient_id)
+                IngredientWeightUnit.objects.\
+                filter(ingredient_id=ingredient_id)
