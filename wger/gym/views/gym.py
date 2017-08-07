@@ -147,7 +147,7 @@ class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, L
         context['active'] = self.active
         context['admin_count'] = len(context['object_list']['admins'])
         context['user_count'] = len(context['object_list']['members'])
-        context['user_table'] = {'keys': [_('ID'), _('Username'), _('Name'), _('Last activity')],
+        context['user_table'] = {'keys': [_('ID'), _('Username'), _('Name'), _('Last activity'), _('Compare')],
                                  'users': context['object_list']['members']}
         return context
 
