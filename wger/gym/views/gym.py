@@ -78,6 +78,23 @@ class GymListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         return context
 
 
+class GymUserCompare(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """
+    Comparision of two or more gym members
+    """
+    model = User
+    permission_required = 'gym.manage.gyms'
+    template_name = 'gym/compare_members.html'
+
+    def get_context_data(self, **kwargs):
+        '''
+        Pass other info to the template
+        '''
+        context = super(GymUserCompare, self).get_context_data(**kwargs)
+        context['gym'] = Gym.objects.get(pk=self.kwargs['pk'])
+        return context
+
+
 class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, ListView):
     '''
     Overview of all users for a specific gym
