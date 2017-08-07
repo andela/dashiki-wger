@@ -16,7 +16,9 @@
 
 import logging
 
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin, PermissionRequiredMixin
+)
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.translation import ugettext as _
 from django.views.generic import UpdateView
@@ -43,7 +45,8 @@ class LanguageConfigUpdateView(WgerFormMixin,
         '''
         Return to the language page
         '''
-        return reverse_lazy('core:language:view', kwargs={'pk': self.object.language_id})
+        return reverse_lazy(
+            'core:language:view', kwargs={'pk': self.object.language_id})
 
     def get_context_data(self, **kwargs):
         context = super(LanguageConfigUpdateView,

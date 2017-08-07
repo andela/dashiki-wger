@@ -23,7 +23,8 @@ class WgerPermission(permissions.BasePermission):
     Checks that the user has access to the object
 
     If the object has a 'owner_object' method, only allow access for the owner
-    user. For the other objects (system wide objects like exercises, etc.) allow
+    user. For the other objects (system wide objects like exercises, etc.)
+    allow
     only safe methods (GET, HEAD or OPTIONS)
     '''
 
@@ -32,7 +33,8 @@ class WgerPermission(permissions.BasePermission):
         Access to public resources is allowed for all, for others, the user
         has to be authenticated
 
-        The is_public flag is not present in all views, e.g. the special APIRoot
+        The is_public flag is not present in all views, e.g. the special
+        APIRoot
         view. If it is not present, treat is as a public endpoint
         '''
         if hasattr(view, 'is_private') and view.is_private:
@@ -75,7 +77,8 @@ class CreateOnlyPermission(permissions.BasePermission):
 
 class UpdateOnlyPermission(permissions.BasePermission):
     '''
-    Custom permission that restricts write operations to PATCH. This is currently
+    Custom permission that restricts write operations to PATCH.
+    This is currently
     used for the user profile.
     '''
 

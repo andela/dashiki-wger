@@ -56,8 +56,10 @@ def load_ingredient_languages(request):
     '''
     Filter the ingredients the user will see by its language.
 
-    Additionally, if the user has selected on his preference page that he wishes
-    to also see the ingredients in English (from the US Department of Agriculture),
+    Additionally, if the user has selected on his preference page that he
+    wishes
+    to also see the ingredients in English (from the US Department of
+    Agriculture),
     show those too.
 
     This only makes sense if the user's language isn't English, as he will be
@@ -72,7 +74,8 @@ def load_ingredient_languages(request):
         profile = request.user.userprofile
         show_english = profile.show_english_ingredients
 
-        # If the user's language is not english and has the preference, add english to the list
+        # If the user's language is not english and has the preference,
+        # add english to the list
         if show_english and language.short_name != 'en':
             languages = (language.id, 2)
 
@@ -100,13 +103,17 @@ def render_footer(url, date=None):
 
 # register new truetype fonts for reportlab
 pdfmetrics.registerFont(TTFont(
-    'OpenSans', path_join(settings.SITE_ROOT, 'core/static/fonts/OpenSans-Light.ttf')))
+    'OpenSans', path_join(
+        settings.SITE_ROOT, 'core/static/fonts/OpenSans-Light.ttf')))
 pdfmetrics.registerFont(TTFont(
-    'OpenSans-Bold', path_join(settings.SITE_ROOT, 'core/static/fonts/OpenSans-Bold.ttf')))
+    'OpenSans-Bold', path_join(
+        settings.SITE_ROOT, 'core/static/fonts/OpenSans-Bold.ttf')))
 pdfmetrics.registerFont(TTFont(
-    'OpenSans-Regular', path_join(settings.SITE_ROOT, 'core/static/fonts/OpenSans-Regular.ttf')))
+    'OpenSans-Regular', path_join(
+        settings.SITE_ROOT, 'core/static/fonts/OpenSans-Regular.ttf')))
 pdfmetrics.registerFont(TTFont(
-    'OpenSans-Italic', path_join(settings.SITE_ROOT, 'core/static/fonts/OpenSans-LightItalic.ttf')))
+    'OpenSans-Italic', path_join(
+        settings.SITE_ROOT, 'core/static/fonts/OpenSans-LightItalic.ttf')))
 
 styleSheet = StyleSheet1()
 styleSheet.add(ParagraphStyle(
