@@ -39,7 +39,9 @@ function onSuccess(googleUser) {
         name: googleUser.getBasicProfile().getName(),
         email: googleUser.getBasicProfile().getEmail()
     }
-    let $formData = $('#csrf_form').serialize()+`&id=${payload['id']}&name=${payload['name']}&email=${payload['email']}`
+    let $formData = $('#csrf_form').serialize()+`
+        &id=${payload['id']}&name=${payload['name']}&email=${payload['email']}
+    `
 
     $.post($uri, $formData).done(function($data){
         if ($data == 'success'){
