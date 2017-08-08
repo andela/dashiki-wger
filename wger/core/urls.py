@@ -35,19 +35,19 @@ from wger.core.views import (
 
 # sub patterns for languages
 patterns_language = [
-   url(r'^list$',
+    url(r'^list$',
         languages.LanguageListView.as_view(),
         name='overview'),
-   url(r'^(?P<pk>\d+)/view$',
+    url(r'^(?P<pk>\d+)/view$',
         languages.LanguageDetailView.as_view(),
         name='view'),
-   url(r'^(?P<pk>\d+)/delete$',
+    url(r'^(?P<pk>\d+)/delete$',
         languages.LanguageDeleteView.as_view(),
         name='delete'),
-   url(r'^(?P<pk>\d+)/edit',
+    url(r'^(?P<pk>\d+)/edit',
         languages.LanguageEditView.as_view(),
         name='edit'),
-   url(r'^add$',
+    url(r'^add$',
         languages.LanguageCreateView.as_view(),
         name='add'),
 ]
@@ -102,7 +102,7 @@ patterns_user = [
     url(r'^password/change$',
         views.password_change,
         {'template_name': 'user/change_password.html',
-          'post_change_redirect': reverse_lazy('core:user:preferences')},
+         'post_change_redirect': reverse_lazy('core:user:preferences')},
         name='change-password'),
     url(r'^password/reset/$',
         views.password_reset,
@@ -114,10 +114,12 @@ patterns_user = [
         views.password_reset_done,
         {'template_name': 'user/password_reset_done.html'},
         name='password_reset_done'),
-    url(r'^password/reset/check/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
+    url(r'^password/reset/check/(?P<uidb64>[0-9A-Za-z_\-]+)/('\
+        '?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
         views.password_reset_confirm,
         {'template_name': 'user/password_reset_confirm.html',
-         'post_reset_redirect': reverse_lazy('core:user:password_reset_complete')},
+         'post_reset_redirect': reverse_lazy(
+             'core:user:password_reset_complete')},
         name='password_reset_confirm'),
     url(r'^password/reset/complete/$',
         views.password_reset_complete,
@@ -204,6 +206,8 @@ urlpatterns = [
     url(r'^language/', include(patterns_language, namespace="language")),
     url(r'^user/', include(patterns_user, namespace="user")),
     url(r'^license/', include(patterns_license, namespace="license")),
-    url(r'^repetition-unit/', include(patterns_repetition_units, namespace="repetition-unit")),
-    url(r'^weight-unit/', include(patterns_weight_units, namespace="weight-unit")),
+    url(r'^repetition-unit/',
+        include(patterns_repetition_units, namespace="repetition-unit")),
+    url(r'^weight-unit/', include(
+        patterns_weight_units, namespace="weight-unit")),
 ]
