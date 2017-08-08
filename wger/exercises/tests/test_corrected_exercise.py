@@ -29,7 +29,8 @@ class ExercisesCorrectionTestCase(WorkoutManagerTestCase):
         Helper function
         '''
         description = 'a nice, long and accurate description for the exercise'
-        response = self.client.post(reverse('exercise:exercise:correct', kwargs={'pk': 1}),
+        response = self.client.post(reverse('exercise:exercise:correct',
+                                            kwargs={'pk': 1}),
                                     {'category': 3,
                                      'name_original': 'my test exercise',
                                      'license': 2,

@@ -32,7 +32,8 @@ from wger.exercises.api.serializers import (
     ExerciseImageSerializer,
     ExerciseCategorySerializer,
     EquipmentSerializer,
-    ExerciseCommentSerializer
+    ExerciseCommentSerializer,
+    DetailedExerciseSerializer
 )
 from wger.exercises.models import (
     Exercise,
@@ -46,25 +47,43 @@ from wger.utils.language import load_item_languages, load_language
 from wger.utils.permissions import CreateOnlyPermission
 
 
+class Shared:
+
+    @staticmethod
+    def exercise_filter_fileds():
+        return ('category',
+                'creation_date',
+                'description',
+                'language',
+                'muscles',
+                'muscles_secondary',
+                'status',
+                'name',
+                'equipment',
+                'license',
+                'license_author')
+
+
 class ExerciseViewSet(viewsets.ModelViewSet):
     '''
     API endpoint for exercise objects
     '''
+    model = Exercise
     queryset = Exercise.objects.all()
     serializer_class = ExerciseSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, CreateOnlyPermission)
     ordering_fields = '__all__'
-    filter_fields = ('category',
-                     'creation_date',
-                     'description',
-                     'language',
-                     'muscles',
-                     'muscles_secondary',
-                     'status',
-                     'name',
-                     'equipment',
-                     'license',
-                     'license_author')
+    filter_fields = Shared.exercise_filter_fileds()
+
+    def get_queryset(self):
+        # if ?detail=all in query string
+        if self.request.GET.get('detail') == 'all':
+            self.serializer_class = DetailedExerciseSerializer
+
+        if self.request.GET.get('id') is not None:
+            self.queryset = Exercise.objects.filter(
+                id=int(self.request.GET.get('id')))
+        return self.queryset
 
     def perform_create(self, serializer):
         '''
@@ -90,7 +109,8 @@ def search(request):
 
     if q:
         languages = load_item_languages(LanguageConfig.SHOW_ITEM_EXERCISES,
-                                        language_code=request.GET.get('language', None))
+                                        language_code=request.GET.get(
+                                            'language', None))
         exercises = (Exercise.objects.filter(name__icontains=q)
                      .filter(language__in=languages)
                      .filter(status=Exercise.STATUS_ACCEPTED)
