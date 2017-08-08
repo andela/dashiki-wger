@@ -63,8 +63,36 @@ from wger.gym.models import (
     GymUserConfig,
     Contract
 )
+from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
+
+
+class Static:
+
+    @staticmethod
+    def make_profile(user, username, password, request):
+        # Pre-set some values of the user's profile
+        language = Language.objects.get(short_name=translation.get_language())
+        user.userprofile.notification_language = language
+
+        # Set default gym, if needed
+        gym_config = GymConfig.objects.get(pk=1)
+        if gym_config.default_gym:
+            user.userprofile.gym = gym_config.default_gym
+
+            # Create gym user configuration object
+            config = GymUserConfig()
+            config.gym = gym_config.default_gym
+            config.user = user
+            config.save()
+
+        user.userprofile.save()
+
+        user = authenticate(username=username, password=password)
+        django_login(request, user)
+        messages.success(request, _('You were successfully registered'))
+        return HttpResponseRedirect(reverse('core:dashboard'))
 
 
 def login(request):
@@ -235,29 +263,7 @@ def registration(request):
                                                    email,
                                                    password)
             user.save()
-
-            # Pre-set some values of the user's profile
-            language = Language.objects.get(
-                short_name=translation.get_language())
-            user.userprofile.notification_language = language
-
-            # Set default gym, if needed
-            gym_config = GymConfig.objects.get(pk=1)
-            if gym_config.default_gym:
-                user.userprofile.gym = gym_config.default_gym
-
-                # Create gym user configuration object
-                config = GymUserConfig()
-                config.gym = gym_config.default_gym
-                config.user = user
-                config.save()
-
-            user.userprofile.save()
-
-            user = authenticate(username=username, password=password)
-            django_login(request, user)
-            messages.success(request, _('You were successfully registered'))
-            return HttpResponseRedirect(reverse('core:dashboard'))
+            return Static.make_profile(user, username, password, request)
     else:
         form = FormClass()
 
@@ -269,6 +275,22 @@ def registration(request):
     template_data['extend_template'] = 'base.html'
 
     return render(request, 'form.html', template_data)
+
+
+def oauth_registration(request):
+    if request.method == 'POST':
+        id, email = request.POST['id'], request.POST['email']
+
+        # first check if user exists
+        user_exists = User.objects.filter(username=email).first()
+        if user_exists:
+            return HttpResponse("user already exists")
+        else:
+            # else create user with credentials
+            user = Django_User.objects.create_user(email, email, id)
+            user.save()
+            if Static.make_profile(user, email, id, request):
+                return HttpResponse("success")
 
 
 @login_required
