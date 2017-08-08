@@ -36,8 +36,8 @@ from django.views.generic import (
     ListView,
     DeleteView,
     CreateView,
-    UpdateView
-)
+    UpdateView,
+    DetailView)
 
 from wger.gym.forms import GymUserAddForm, GymUserPermisssionForm
 from wger.gym.helpers import (
@@ -48,15 +48,17 @@ from wger.gym.helpers import (
 from wger.gym.models import (
     Gym,
     GymAdminConfig,
-    GymUserConfig
-)
+    GymUserConfig,
+    AdminUserNote, Contract)
 from wger.config.models import GymConfig as GlobalGymConfig
+from wger.manager.models import Workout, WorkoutLog, WorkoutSession
+from wger.nutrition.models import NutritionPlan
 from wger.utils.generic_views import (
     WgerFormMixin,
     WgerDeleteMixin,
     WgerMultiplePermissionRequiredMixin)
 from wger.utils.helpers import password_generator
-
+from wger.weight.models import WeightEntry
 
 logger = logging.getLogger(__name__)
 
@@ -78,21 +80,63 @@ class GymListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         return context
 
 
-class GymUserCompare(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, DetailView):
     """
     Comparision of two or more gym members
     """
     model = User
-    permission_required = 'gym.manage.gyms'
+    permission_required = ('gym.manage_gym', 'gym.manage_gyms', 'gym.gym_trainer')
     template_name = 'gym/compare_members.html'
+    context_object_name = 'current_user'
+    user_ids = [7, 9]
+    users = [User.objects.get(pk=user_id) for user_id in user_ids]
+
+    def dispatch(self, request, *args, **kwargs):
+        '''
+        Check permissions
+
+        - Only managers for this gym can access the members
+        - General managers can access the detail page of all users
+        '''
+        current_user = request.user
+
+        if not current_user.is_authenticated():
+            return HttpResponseForbidden()
+
+        if (current_user.has_perm('gym.manage_gym') or current_user.has_perm('gym.gym_trainer')) \
+                and not current_user.has_perm('gym.manage_gyms'):
+            return HttpResponseForbidden()
+
+        return super(GymUserCompare, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         '''
-        Pass other info to the template
+        Send some additional data to the template
         '''
         context = super(GymUserCompare, self).get_context_data(**kwargs)
-        context['gym'] = Gym.objects.get(pk=self.kwargs['pk'])
-        return context
+        workouts = {user: Workout.objects.filter(user=user.id).all()
+                    for user in self.users}
+
+        for (user, workouts) in workouts.items():
+            out = []
+            for workout in workouts:
+                logs = WorkoutLog.objects.filter(workout=workout)
+                out.append({'workout': workout,
+                            'logs': logs.dates('date', 'day').count(),
+                            'last_log': logs.last()})
+
+            context['workouts'] = {user: out}
+
+        weight_entries = {user: WeightEntry.objects.filter(user=user).order_by('-date')[:5]
+                          for user in self.users}
+        context['weight_entries'] = weight_entries
+        nutritional_plans = {user: NutritionPlan.objects.filter(user=user).order_by('-create_date')[:5]
+                             for user in self.users}
+        context['nutrition_plans'] = nutritional_plans
+        session = {user: WeightEntry.objects.filter(user=user).order_by('-date')[:10]
+                   for user in self.users}
+        context['session'] = session
+        return context['']
 
 
 class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, ListView):
