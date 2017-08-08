@@ -85,9 +85,11 @@ def login(request):
 @login_required()
 def delete(request, user_pk=None):
     '''
-    Delete a user account and all his data, requires password confirmation first
+    Delete a user account and all his data,
+    requires password confirmation first
 
-    If no user_pk is present, the user visiting the URL will be deleted, otherwise
+    If no user_pk is present, the user visiting
+    the URL will be deleted, otherwise
     a gym administrator is deleting a different user
     '''
 
@@ -116,14 +118,16 @@ def delete(request, user_pk=None):
 
             user.delete()
             messages.success(request,
-                             _('Account "{0}" was successfully deleted').format(user.username))
+                             _(
+                                 'Account "{0}" was successfully deleted').format(user.username))
 
             if not user_pk:
                 django_logout(request)
                 return HttpResponseRedirect(reverse('software:features'))
             else:
                 gym_pk = request.user.userprofile.gym_id
-                return HttpResponseRedirect(reverse('gym:gym:user-list', kwargs={'pk': gym_pk}))
+                return HttpResponseRedirect(
+                    reverse('gym:gym:user-list', kwargs={'pk': gym_pk}))
     context = {'form': form,
                'user_delete': user,
                'form_action': form_action}
@@ -163,8 +167,10 @@ def trainer_login(request, user_pk):
         own = True
 
     # Note: it seems we have to manually set the authentication backend here
-    # - https://docs.djangoproject.com/en/1.6/topics/auth/default/#auth-web-requests
-    # - http://stackoverflow.com/questions/3807777/django-login-without-authenticating
+    # - https://docs.djangoproject.com/en/1.6/topics/auth/default/
+    # #auth-web-requests
+    # - http://stackoverflow.com/questions
+    # /3807777/django-login-without-authenticating
     if own:
         del(request.session['trainer.identity'])
     user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -177,8 +183,9 @@ def trainer_login(request, user_pk):
         else:
             return HttpResponseRedirect(reverse('core:index'))
     else:
-        return HttpResponseRedirect(reverse('gym:gym:user-list',
-                                            kwargs={'pk': user.userprofile.gym_id}))
+        return HttpResponseRedirect(
+            reverse('gym:gym:user-list',
+                    kwargs={'pk': user.userprofile.gym_id}))
 
 
 def logout(request):
@@ -230,7 +237,8 @@ def registration(request):
             user.save()
 
             # Pre-set some values of the user's profile
-            language = Language.objects.get(short_name=translation.get_language())
+            language = Language.objects.get(
+                short_name=translation.get_language())
             user.userprofile.notification_language = language
 
             # Set default gym, if needed
@@ -275,7 +283,8 @@ def preferences(request):
     # Process the preferences form
     if request.method == 'POST':
 
-        form = UserPreferencesForm(data=request.POST, instance=request.user.userprofile)
+        form = UserPreferencesForm(
+            data=request.POST, instance=request.user.userprofile)
         form.user = request.user
 
         # Save the data if it validates
@@ -287,7 +296,8 @@ def preferences(request):
 
     # Process the email form
     if request.method == 'POST':
-        email_form = UserPersonalInformationForm(data=request.POST, instance=request.user)
+        email_form = UserPersonalInformationForm(
+            data=request.POST, instance=request.user)
 
         if email_form.is_valid() and redirect:
             email_form.save()
@@ -315,7 +325,8 @@ class UserDeactivateView(LoginRequiredMixin,
     '''
     permanent = False
     model = User
-    permission_required = ('gym.manage_gym', 'gym.manage_gyms', 'gym.gym_trainer')
+    permission_required = (
+        'gym.manage_gym', 'gym.manage_gyms', 'gym.gym_trainer')
 
     def dispatch(self, request, *args, **kwargs):
         '''
@@ -326,17 +337,20 @@ class UserDeactivateView(LoginRequiredMixin,
         if not request.user.is_authenticated():
             return HttpResponseForbidden()
 
-        if (request.user.has_perm('gym.manage_gym') or request.user.has_perm('gym.gym_trainer')) \
+        if (request.user.has_perm(
+            'gym.manage_gym') or request.user.has_perm('gym.gym_trainer')) \
                 and edit_user.userprofile.gym_id != request.user.userprofile.gym_id:
             return HttpResponseForbidden()
 
-        return super(UserDeactivateView, self).dispatch(request, *args, **kwargs)
+        return super(
+            UserDeactivateView, self).dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, pk):
         edit_user = get_object_or_404(User, pk=pk)
         edit_user.is_active = False
         edit_user.save()
-        messages.success(self.request, _('The user was successfully deactivated'))
+        messages.success(self.request, _(
+            'The user was successfully deactivated'))
         return reverse('core:user:overview', kwargs=({'pk': pk}))
 
 
@@ -348,7 +362,8 @@ class UserActivateView(LoginRequiredMixin,
     '''
     permanent = False
     model = User
-    permission_required = ('gym.manage_gym', 'gym.manage_gyms', 'gym.gym_trainer')
+    permission_required = (
+        'gym.manage_gym', 'gym.manage_gyms', 'gym.gym_trainer')
 
     def dispatch(self, request, *args, **kwargs):
         '''
@@ -359,7 +374,8 @@ class UserActivateView(LoginRequiredMixin,
         if not request.user.is_authenticated():
             return HttpResponseForbidden()
 
-        if (request.user.has_perm('gym.manage_gym') or request.user.has_perm('gym.gym_trainer')) \
+        if (request.user.has_perm(
+            'gym.manage_gym') or request.user.has_perm('gym.gym_trainer')) \
                 and edit_user.userprofile.gym_id != request.user.userprofile.gym_id:
             return HttpResponseForbidden()
 
@@ -369,7 +385,8 @@ class UserActivateView(LoginRequiredMixin,
         edit_user = get_object_or_404(User, pk=pk)
         edit_user.is_active = True
         edit_user.save()
-        messages.success(self.request, _('The user was successfully activated'))
+        messages.success(self.request, _(
+            'The user was successfully activated'))
         return reverse('core:user:overview', kwargs=({'pk': pk}))
 
 
@@ -412,7 +429,8 @@ class UserEditView(WgerFormMixin,
         Send some additional data to the template
         '''
         context = super(UserEditView, self).get_context_data(**kwargs)
-        context['form_action'] = reverse('core:user:edit', kwargs={'pk': self.object.id})
+        context['form_action'] = reverse(
+            'core:user:edit', kwargs={'pk': self.object.id})
         context['title'] = _('Edit {0}'.format(self.object))
         return context
 
@@ -444,12 +462,14 @@ def api_key(request):
     return render(request, 'user/api_key.html', context)
 
 
-class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, DetailView):
+class UserDetailView(LoginRequiredMixin,
+                     WgerMultiplePermissionRequiredMixin, DetailView):
     '''
     User overview for gyms
     '''
     model = User
-    permission_required = ('gym.manage_gym', 'gym.manage_gyms', 'gym.gym_trainer')
+    permission_required = (
+        'gym.manage_gym', 'gym.manage_gyms', 'gym.gym_trainer')
     template_name = 'user/overview.html'
     context_object_name = 'current_user'
 
@@ -465,7 +485,8 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         if not user.is_authenticated():
             return HttpResponseForbidden()
 
-        if (user.has_perm('gym.manage_gym') or user.has_perm('gym.gym_trainer')) \
+        if (user.has_perm(
+            'gym.manage_gym') or user.has_perm('gym.gym_trainer')) \
                 and not user.has_perm('gym.manage_gyms') \
                 and user.userprofile.gym != self.get_object().userprofile.gym:
             return HttpResponseForbidden()
@@ -485,12 +506,17 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                         'logs': logs.dates('date', 'day').count(),
                         'last_log': logs.last()})
         context['workouts'] = out
-        context['weight_entries'] = WeightEntry.objects.filter(user=self.object)\
+        context['weight_entries'] = WeightEntry.objects.filter(
+            user=self.object)\
             .order_by('-date')[:5]
-        context['nutrition_plans'] = NutritionPlan.objects.filter(user=self.object)\
+        context['nutrition_plans'] = NutritionPlan.objects.filter(
+            user=self.object)\
             .order_by('-creation_date')[:5]
-        context['session'] = WorkoutSession.objects.filter(user=self.object).order_by('-date')[:10]
-        context['admin_notes'] = AdminUserNote.objects.filter(member=self.object)[:5]
+        context['session'] = WorkoutSession.objects.filter(
+            user=self.object).order_by('-date')[:10]
+        context['admin_notes'] = AdminUserNote.objects.filter(
+            member=self.object)[
+            :5]
         context['contracts'] = Contract.objects.filter(member=self.object)[:5]
         return context
 
@@ -510,7 +536,8 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         out = {'admins': [],
                'members': []}
 
-        for u in User.objects.select_related('usercache', 'userprofile__gym').all():
+        for u in User.objects.select_related(
+                'usercache', 'userprofile__gym').all():
             out['members'].append({'obj': u,
                                    'last_log': u.usercache.last_activity})
 
