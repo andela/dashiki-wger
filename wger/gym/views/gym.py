@@ -136,7 +136,7 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         session = {user: WeightEntry.objects.filter(user=user).order_by('-date')[:10]
                    for user in self.users}
         context['session'] = session
-        return context['']
+        return context
 
 
 class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, ListView):
