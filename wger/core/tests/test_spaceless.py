@@ -39,4 +39,4 @@ class SpacelessTestCase(WorkoutManagerTestCase):
             self.assertEqual(t.render(context), '<p>A text</p><p>more</p>')
 
         with self.settings(WGER_SETTINGS={'REMOVE_WHITESPACE': False}):
-            self.assertEqual(t.render(context), '<p>A text</p>   <p>more</p>')
+            self.assertEqual(t.render(context), '<p>A text</p><p>more</p>')
