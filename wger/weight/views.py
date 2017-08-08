@@ -18,7 +18,8 @@ import logging
 import csv
 import datetime
 
-from django.shortcuts import render
+from django.contrib.auth.models import User
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -166,8 +167,12 @@ def get_weight_data(request, username=None):
     '''
     Process the data to pass it to the JS libraries to generate an SVG image
     '''
-
-    is_owner, user = check_access(request.user, username)
+    current_user = request.user
+    if (current_user.has_perm('gym.manage_gym')
+        or current_user.has_perm('gym.gym_trainer')):
+        user = get_object_or_404(User, username=username)
+    else:
+        is_owner, user = check_access(request.user, username)
 
     date_min = request.GET.get('date_min', False)
     date_max = request.GET.get('date_max', True)

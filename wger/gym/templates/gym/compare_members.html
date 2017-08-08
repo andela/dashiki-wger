@@ -3,6 +3,12 @@
 
 {% block title %} Compare members {% endblock %}
 
+{#        #}
+{# Header #}
+{#        #}
+{% block header %}
+    <script src="{% static 'js/weight.js' %}"></script>
+{% endblock %}
 
 {% block breadcrumbs %}
     {% if current_user.userprofile.gym %}
@@ -52,6 +58,17 @@
             {% endfor %}
             </tbody>
             </table>
+
+            <div id="current-username" data-current-username="{{ user.username }}"></div>
+            {% if not min_date %}
+            <p>
+                {% trans "There is no chart here because there are no weight entries." %}
+                {% trans "Use link to add one." %}
+            </p>
+            {% endif %}
+
+            <div id="weight_diagram"></div>
+
         {% endfor %}
 
     {% endif %}
