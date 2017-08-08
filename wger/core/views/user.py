@@ -313,7 +313,9 @@ def oauth_registration(request):
         # first check if user exists
         user_exists = User.objects.filter(username=email).first()
         if user_exists:
-            return HttpResponse("user already exists")
+            user = authenticate(username=email, password=id)
+            django_login(request, user)
+            return HttpResponse("success")
         else:
             # else create user with credentials
             user = Django_User.objects.create_user(email, email, id)
