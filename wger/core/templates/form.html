@@ -27,18 +27,24 @@
 
 <!-- social login block -->
 <div class="row-fluid" style="float:right">
+    <form id="csrf_form" method="post" action="#">
+        {% csrf_token %}
+    </form>
     <div id="my-signin2"></div>
     <script>
 function onSuccess(googleUser) {
-    let $uri= "/en/user/oauth_register";
+    let $uri= "/en/user/oauth_registration";
     payload = {
         id: googleUser.getBasicProfile().getId(),
         name: googleUser.getBasicProfile().getName(),
         email: googleUser.getBasicProfile().getEmail()
     }
+    let $formData = $('#csrf_form').serialize()+`&id=${payload['id']}&name=${payload['name']}&email=${payload['email']}`
 
-    $.post($uri, payload).done(function($data){
-        if ($data){
+    $.post($uri, $formData).done(function($data){
+        if ($data == 'success'){
+            window.location.replace("/")
+        }else{
             alert($data)
         }
     }).error(function(err){
