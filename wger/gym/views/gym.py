@@ -142,17 +142,6 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         return context
 
 
-class GymUserPost(GymUserCompare, View):
-    def post(self, request, *args, **kwargs):
-        user_ids = request.POST.getlist('selected[]')
-        url =request.POST.getlist('url')
-        print("DATA")
-        m = "{% url 'gym:gym:compare' pk=gym_id %}"
-        return HttpResponse("success")
-        # return HttpResponseRedirect(reverse('gym:gym:user-compare', kwargs={'pk': gym_id}))
-        # return GymUserCompare.as_view(user_ids=user_ids)
-
-
 class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, ListView):
     '''
     Overview of all users for a specific gym

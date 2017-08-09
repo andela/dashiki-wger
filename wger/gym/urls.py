@@ -73,7 +73,7 @@ patterns_gym = [
         gym.GymUserCompare.as_view(),
         name='user-compare'),
     url(r'^(?P<pk>\d+)/members/compare/$',
-        gym.GymUserPost.as_view(),
+        gym.GymUserCompare.as_view(),
         name='compare'),
 ]
 
