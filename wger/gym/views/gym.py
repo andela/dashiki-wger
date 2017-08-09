@@ -115,7 +115,6 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         '''
         self.user_ids = self.kwargs['user_list'].split('-or-')
         self.users = [User.objects.get(pk=user_id) for user_id in self.user_ids]
-        print(self.user_ids)
         context = super(GymUserCompare, self).get_context_data(**kwargs)
         workouts = {user: Workout.objects.filter(user=user.id).all()
                     for user in self.users}
@@ -139,6 +138,7 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         session = {user: WeightEntry.objects.filter(user=user).order_by('-date')[:10]
                    for user in self.users}
         context['session'] = session
+        context['users'] = '-or-'.join([user.username for user in self.users])
         return context
 
 

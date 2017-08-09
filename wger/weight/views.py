@@ -194,12 +194,17 @@ def get_weight_data(request, username=None):
 
 
 @api_view(['GET'])
-def get_multiple_weight_data(request):
+def get_multiple_weight_data(request, user_list=None):
     '''
     Process the data to pass it to the JS libraries to generate an SVG image
     '''
     current_user = request.user
-    usernames = ['mad', 'compare']
+    usernames = []
+    if user_list:
+        usernames = user_list.split('-or-')
+    else:
+        return
+
     chart_data = {}
     date_min = request.GET.get('date_min', False)
     date_max = request.GET.get('date_max', True)

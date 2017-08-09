@@ -27,7 +27,7 @@
     {% url 'core:user:trainer-login' current_user.pk as trainer_login %}
     {% if perms.gym.gym_trainer %}
         <h4>{% trans "Weight" %}</h4>
-        <div id="current-username" data-current-username="{{ user.username }}"></div>
+        <div id="members" data-current-username="{{ users }}"></div>
         <div id="weight_diagram"></div>
         <div class="legend"></div>
         <hr/>

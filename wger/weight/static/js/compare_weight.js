@@ -32,8 +32,8 @@ function modifyTimePeriod(data, pastNumberDays) {
 }
 
 $(document).ready(function () {
-  var url;
   var username;
+  var url;
   var chartParams;
   var weightChart;
   weightChart = {};
@@ -52,8 +52,8 @@ $(document).ready(function () {
     colors: ['blue', 'rgb(255,100,43)', '#CCCCFF', '#3465a4'],
   };
 
-  username = $('#current-username').data('currentUsername');
-  url = '/weight/api/get_multiple_weight_data/';
+  username = $('#members').data('currentUsername');
+  url = '/weight/api/get_multiple_weight_data/' + username;
 
   d3.json(url, function (json) {
     var data = [];
