@@ -145,6 +145,7 @@ urlpatterns = i18n_patterns(
     url(r'config/', include('wger.config.urls', namespace='config', app_name='config')),
     url(r'gym/', include('wger.gym.urls', namespace='gym', app_name='gym')),
     url(r'email/', include('wger.email.urls', namespace='email')),
+    url(r'^fitbit/', include('fitapp.urls')),
     url(r'^sitemap\.xml$',
         sitemap,
         {'sitemaps': sitemaps},
