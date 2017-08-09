@@ -193,6 +193,38 @@ def get_weight_data(request, username=None):
     return Response(chart_data)
 
 
+@api_view(['GET'])
+def get_multiple_weight_data(request):
+    '''
+    Process the data to pass it to the JS libraries to generate an SVG image
+    '''
+    current_user = request.user
+    usernames = ['mad', 'compare']
+    chart_data = {}
+    date_min = request.GET.get('date_min', False)
+    date_max = request.GET.get('date_max', True)
+
+    if (current_user.has_perm('gym.manage_gym')
+        or current_user.has_perm('gym.gym_trainer')):
+        for username in usernames:
+            user = get_object_or_404(User, username=username)
+
+            if date_min and date_max:
+                weights = WeightEntry.objects.filter(user=user,
+                                                     date__range=(date_min, date_max))
+            else:
+                weights = WeightEntry.objects.filter(user=user)
+            my_chart_data = []
+            for i in weights:
+                my_chart_data
+                my_chart_data.append({'date': i.date,
+                                   'weight': i.weight})
+            chart_data[username] = my_chart_data
+
+    # Return the results to the client
+    return Response(chart_data)
+
+
 class WeightCsvImportFormPreview(FormPreview):
     preview_template = 'import_csv_preview.html'
     form_template = 'import_csv_form.html'

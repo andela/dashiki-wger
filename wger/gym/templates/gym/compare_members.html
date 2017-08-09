@@ -7,7 +7,7 @@
 {# Header #}
 {#        #}
 {% block header %}
-    <script src="{% static 'js/weight.js' %}"></script>
+    <script src="{% static 'js/compare_weight.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -35,28 +35,28 @@
             </h4>
 
             <table class="table">
-            <thead>
-            <tr>
-                <th style="width: 25%;">{% trans "Date" %}</th>
-                <th>{% trans "Weight" %}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for weight in weight_list %}
-            <tr>
-                <td>
-                    {{weight.date}}
-                </td>
-                <td>
-                    {{weight.weight}} {% trans_weight_unit 'kg' current_user %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">{% trans "Nothing found" %}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">{% trans "Date" %}</th>
+                        <th>{% trans "Weight" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for weight in weight_list %}
+                    <tr>
+                        <td>
+                            {{weight.date}}
+                        </td>
+                        <td>
+                            {{weight.weight}} {% trans_weight_unit 'kg' current_user %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">{% trans "Nothing found" %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
             </table>
 
             <div id="current-username" data-current-username="{{ user.username }}"></div>
@@ -68,8 +68,7 @@
             {% endif %}
 
             <div id="weight_diagram"></div>
-
+            <div class="legend"></div>
         {% endfor %}
-
     {% endif %}
 {% endblock %}
