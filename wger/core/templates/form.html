@@ -46,6 +46,13 @@ window.fbAsyncInit = function() {
     {% render_form_fields form submit_text %}
 </form>
 
+{% endblock %}
+
+
+<!--
+    Side bar
+-->
+{% block sidebar %}
 <!-- social login block -->
 <div class="row-fluid">
     <div class="col-md-3" style="float: none;margin: 0 auto">
@@ -123,10 +130,4 @@ function renderButton() {
 }
     </script>
 </div>
-{% endblock %}
-
-
-<!--
-    Side bar
--->
-{% block sidebar %}{% if sidebar %}{% include sidebar %}{% endif %}{% endblock %}
+{% if sidebar %}{% include sidebar %}{% endif %}{% endblock %}
