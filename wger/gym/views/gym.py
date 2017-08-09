@@ -29,7 +29,7 @@ from django.http.response import (
     HttpResponse,
     HttpResponseRedirect
 )
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django.views.generic import (
@@ -37,7 +37,7 @@ from django.views.generic import (
     DeleteView,
     CreateView,
     UpdateView,
-    DetailView)
+    DetailView, View)
 
 from wger.gym.forms import GymUserAddForm, GymUserPermisssionForm
 from wger.gym.helpers import (
@@ -88,8 +88,8 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
     permission_required = ('gym.manage_gym', 'gym.manage_gyms', 'gym.gym_trainer')
     template_name = 'gym/compare_members.html'
     context_object_name = 'current_user'
-    user_ids = [7, 9]
-    users = [User.objects.get(pk=user_id) for user_id in user_ids]
+    user_ids = []
+    users = []
 
     def dispatch(self, request, *args, **kwargs):
         '''
@@ -113,6 +113,9 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         '''
         Send some additional data to the template
         '''
+        self.user_ids = self.kwargs['user_list'].split('-or-')
+        self.users = [User.objects.get(pk=user_id) for user_id in self.user_ids]
+        print(self.user_ids)
         context = super(GymUserCompare, self).get_context_data(**kwargs)
         workouts = {user: Workout.objects.filter(user=user.id).all()
                     for user in self.users}
@@ -137,6 +140,17 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                    for user in self.users}
         context['session'] = session
         return context
+
+
+class GymUserPost(GymUserCompare, View):
+    def post(self, request, *args, **kwargs):
+        user_ids = request.POST.getlist('selected[]')
+        url =request.POST.getlist('url')
+        print("DATA")
+        m = "{% url 'gym:gym:compare' pk=gym_id %}"
+        return HttpResponse("success")
+        # return HttpResponseRedirect(reverse('gym:gym:user-compare', kwargs={'pk': gym_id}))
+        # return GymUserCompare.as_view(user_ids=user_ids)
 
 
 class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, ListView):
