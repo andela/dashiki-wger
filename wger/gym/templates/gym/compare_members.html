@@ -26,49 +26,57 @@
 {% block content %}
     {% url 'core:user:trainer-login' current_user.pk as trainer_login %}
     {% if perms.gym.gym_trainer %}
-        {% for user, weight_list in weight_entries.items %}
-            <h4>
-                {{ user }} {% trans "Weight" %}
-                <small>
-                    ({% blocktrans with number=5 %}last {{ number }}{% endblocktrans %})
-                </small>
-            </h4>
+        <h4>{% trans "Weight" %}</h4>
+        <div id="current-username" data-current-username="{{ user.username }}"></div>
+        <div id="weight_diagram"></div>
+        <div class="legend"></div>
+        <hr/>
+        <h4> {% trans "Weight Details" %} </h4>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="width: 25%;">{% trans "Date" %}</th>
-                        <th>{% trans "Weight" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for weight in weight_list %}
-                    <tr>
-                        <td>
-                            {{weight.date}}
-                        </td>
-                        <td>
-                            {{weight.weight}} {% trans_weight_unit 'kg' current_user %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3">{% trans "Nothing found" %}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        <ul class="nav nav-tabs">
+            {% for user, weight_list in weight_entries.items %}
+              <li><a data-toggle="tab" href="#{{ user.username }}">{{ user.username }}</a></li>
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+            {% for user, weight_list in weight_entries.items %}
+              <div id="{{ user }}" class="tab-pane fade">
+                <p>
+                  <h4>
+                    {{ user }} {% trans "Weight" %}
+                    <small>
+                        ({% blocktrans with number=5 %}last {{ number }}{% endblocktrans %})
+                    </small>
+                </h4>
 
-            <div id="current-username" data-current-username="{{ user.username }}"></div>
-            {% if not min_date %}
-            <p>
-                {% trans "There is no chart here because there are no weight entries." %}
-                {% trans "Use link to add one." %}
-            </p>
-            {% endif %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">{% trans "Date" %}</th>
+                            <th>{% trans "Weight" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for weight in weight_list %}
+                        <tr>
+                            <td>
+                                {{weight.date}}
+                            </td>
+                            <td>
+                                {{weight.weight}} {% trans_weight_unit 'kg' current_user %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">{% trans "Nothing found" %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </p>
+              </div>
+            {% endfor %}
+        </div>
 
-            <div id="weight_diagram"></div>
-            <div class="legend"></div>
-        {% endfor %}
     {% endif %}
 {% endblock %}
