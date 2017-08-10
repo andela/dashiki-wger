@@ -66,7 +66,8 @@ class PreferencesTestCase(WorkoutManagerTestCase):
         self.assertTrue(profile.workout_reminder_active)
         self.assertEqual(profile.workout_reminder, 30)
         self.assertEqual(profile.workout_duration, 12)
-        self.assertEqual(User.objects.get(username='test').email, 'my-new-email@example.com')
+        self.assertEqual(User.objects.get(
+            username='test').email, 'my-new-email@example.com')
 
         # Change some preferences
         response = self.client.post(reverse('core:user:preferences'),

@@ -37,7 +37,8 @@ class LanguageConfig(models.Model):
     '''
     Configuration for languages
 
-    Allows to specify what exercises and ingredients are shown for each language
+    Allows to specify what exercises and ingredients are shown for
+    each language
     '''
     SHOW_ITEM_EXERCISES = '1'
     SHOW_ITEM_INGREDIENTS = '2'
@@ -77,7 +78,8 @@ class LanguageConfig(models.Model):
         super(LanguageConfig, self).save(*args, **kwargs)
 
         # Cached objects
-        cache.delete(cache_mapper.get_language_config_key(self.language, self.item))
+        cache.delete(cache_mapper.get_language_config_key(
+            self.language, self.item))
 
         # Cached template fragments
         delete_template_fragment_cache('muscle-overview', self.language_id)
@@ -89,7 +91,8 @@ class LanguageConfig(models.Model):
         '''
 
         # Cached objects
-        cache.delete(cache_mapper.get_language_config_key(self.language, self.item))
+        cache.delete(cache_mapper.get_language_config_key(
+            self.language, self.item))
 
         # Cached template fragments
         delete_template_fragment_cache('muscle-overview', self.language_id)
@@ -107,14 +110,15 @@ class GymConfig(models.Model):
     TODO: close registration (users can only become members thorough an admin)
     '''
 
-    default_gym = models.ForeignKey(Gym,
-                                    verbose_name=_('Default gym'),
-                                    help_text=_('Select the default gym for this installation. '
-                                                'This will assign all new registered users to this '
-                                                'gym and update all existing users without a '
-                                                'gym.'),
-                                    null=True,
-                                    blank=True)
+    default_gym = models.ForeignKey(
+        Gym,
+        verbose_name=_('Default gym'),
+        help_text=_('Select the default gym for this installation. '
+                    'This will assign all new registered users to this '
+                    'gym and update all existing users without a '
+                    'gym.'),
+        null=True,
+        blank=True)
     '''
     Default gym for the wger installation
     '''
@@ -145,6 +149,8 @@ class GymConfig(models.Model):
                         config.gym = self.default_gym
                         config.user = user
                         config.save()
-                        logger.debug('Creating GymUserConfig for user {0}'.format(user.username))
+                        logger.debug(
+                            'Creating GymUserConfig for user '
+                            '{0}'.format(user.username))
 
         return super(GymConfig, self).save(*args, **kwargs)
