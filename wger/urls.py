@@ -144,6 +144,7 @@ urlpatterns = i18n_patterns(
     url(r'software/', include('wger.software.urls', namespace='software', app_name='software')),
     url(r'config/', include('wger.config.urls', namespace='config', app_name='config')),
     url(r'gym/', include('wger.gym.urls', namespace='gym', app_name='gym')),
+    url(r'fitbit/', include('wger.fitbit.urls', namespace='fitbit', app_name='fitbit')),
     url(r'email/', include('wger.email.urls', namespace='email')),
     url(r'^sitemap\.xml$',
         sitemap,
@@ -159,7 +160,6 @@ urlpatterns += [
         TextTemplateView.as_view(template_name="robots.txt"),
         name='robots'),
     url(r'^manifest\.webapp$', WebappManifestView.as_view(template_name="manifest.webapp")),
-    url(r'^fitbit/', include('fitapp.urls')),
     url(r'^amazon-manifest\.webapp$', WebappManifestView.as_view(template_name="amazon-manifest.webapp")),
 
     # API
