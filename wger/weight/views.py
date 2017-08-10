@@ -200,11 +200,10 @@ def get_multiple_weight_data(request, user_list=None):
     Process the data to pass it to the JS libraries to generate an SVG image
     '''
     current_user = request.user
-    usernames = []
     if user_list:
         usernames = user_list.split('-or-')
     else:
-        return
+        return Response("Unauthorized")
 
     chart_data = {}
     date_min = request.GET.get('date_min', False)
@@ -232,30 +231,35 @@ def get_multiple_weight_data(request, user_list=None):
 
 
 @api_view(['GET'])
-def get_nutritional_plans(request):
+def get_nutritional_plans(request, user_list=None):
     '''
         Process the data to pass it to the JS libraries to generate an SVG image
     '''
-    user_id = 9
-    user = User.objects.get(pk=user_id)
-    # nutritional_plans = [{user.username: NutritionPlan.objects.filter(user=user).order_by('creation_date')[:5]}]
-    n = [plan for plan in NutritionPlan.objects.filter(user=user).order_by('creation_date')[:5]]
+    current_user = request.user
+    if (not current_user.has_perm('gym.manage_gym')
+        or not current_user.has_perm('gym.gym_trainer')):
+        return Response("Unauthorized")
+
+    if user_list:
+        user_ids = user_list.split('-or-')
+    else:
+        return Response("Unauthorized")
+
+    users = [User.objects.get(pk=user_id) for user_id in user_ids]
     chart_data = {}
-    data = []
-    for plan in n:
-        date=plan.creation_date
-        energy=plan.get_nutritional_values()['total']['energy']
-        protein=plan.get_nutritional_values()['total']['protein']
-        carbohydrates=plan.get_nutritional_values()['total']['carbohydrates']
-        fat=plan.get_nutritional_values()['total']['fat']
-        data.append({
-            'date': date,
-            'energy': energy,
-            'protein': protein,
-            'carbohydrates': carbohydrates,
-            'fat': fat
-        })
-    chart_data[user.username] = data
+
+    for user in users:
+        nutritional_plan = [plan for plan in NutritionPlan.objects.filter(user=user).order_by('creation_date')[:5]]
+        data = []
+        for plan in nutritional_plan:
+            data.append({
+                'date': plan.creation_date,
+                'energy': plan.get_nutritional_values()['total']['energy'],
+                'protein': plan.get_nutritional_values()['total']['protein'],
+                'carbohydrates': plan.get_nutritional_values()['total']['carbohydrates'],
+                'fat': plan.get_nutritional_values()['total']['fat']
+            })
+        chart_data[user.username] = data
     return Response(chart_data)
 
 
