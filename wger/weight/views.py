@@ -38,6 +38,7 @@ from rest_framework.decorators import api_view
 
 from formtools.preview import FormPreview
 
+from wger.nutrition.models import NutritionPlan
 from wger.weight.forms import WeightForm
 from wger.weight.models import WeightEntry
 from wger.weight import helpers
@@ -227,6 +228,34 @@ def get_multiple_weight_data(request, user_list=None):
             chart_data[username] = my_chart_data
 
     # Return the results to the client
+    return Response(chart_data)
+
+
+@api_view(['GET'])
+def get_nutritional_plans(request):
+    '''
+        Process the data to pass it to the JS libraries to generate an SVG image
+    '''
+    user_id = 9
+    user = User.objects.get(pk=user_id)
+    # nutritional_plans = [{user.username: NutritionPlan.objects.filter(user=user).order_by('creation_date')[:5]}]
+    n = [plan for plan in NutritionPlan.objects.filter(user=user).order_by('creation_date')[:5]]
+    chart_data = {}
+    data = []
+    for plan in n:
+        date=plan.creation_date
+        energy=plan.get_nutritional_values()['total']['energy']
+        protein=plan.get_nutritional_values()['total']['protein']
+        carbohydrates=plan.get_nutritional_values()['total']['carbohydrates']
+        fat=plan.get_nutritional_values()['total']['fat']
+        data.append({
+            'date': date,
+            'energy': energy,
+            'protein': protein,
+            'carbohydrates': carbohydrates,
+            'fat': fat
+        })
+    chart_data[user.username] = data
     return Response(chart_data)
 
 

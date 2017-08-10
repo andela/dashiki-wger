@@ -14,25 +14,24 @@ $(document).ready( function () {
 });
 </script>
 
-<script>
-    function compareMembers() {
-        var selected = [];
-        var new_url = "";
-        $("input:checkbox[name=selected_member]:checked").each(function(){
-            selected.push($(this).val());
-        });
-        for (var i=0; i < selected.length; i++) {
-            if (i === (selected.length - 1)) {
-                new_url += selected[i];
-            } else {
-                new_url += selected[i] + "-or-";
-            }
-        }
-        window.location = "{% url 'gym:gym:compare' pk=gym_id %}" + new_url;
-    }
-</script>
-
 {% if not show_gym %}
+    <script>
+        function compareMembers() {
+            var selected = [];
+            var new_url = "";
+            $("input:checkbox[name=selected_member]:checked").each(function(){
+                selected.push($(this).val());
+            });
+            for (var i=0; i < selected.length; i++) {
+                if (i === (selected.length - 1)) {
+                    new_url += selected[i];
+                } else {
+                    new_url += selected[i] + "-or-";
+                }
+            }
+            window.location = "{% url 'gym:gym:compare' pk=gym_id %}" + new_url;
+        }
+    </script>
     {% if active %}
         <a href="{% url 'gym:gym:user-list-inactive' gym_id %}" class="btn btn-default btn-sm">Inactive Users</a>
     {% else %}
