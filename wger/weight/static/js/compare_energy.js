@@ -38,27 +38,28 @@ $(document).ready(function () {
   var weightChart;
   weightChart = {};
   chartParams = {
+    title: 'Energy Levels (KCal)',
     animate_on_load: true,
     full_width: true,
     top: 10,
-    left: 30,
+    left: 50,
     right: 20,
     show_secondary_x_label: true,
     xax_count: 10,
-    target: '#weight_diagram',
+    target: '#energy_diagram',
     x_accessor: 'date',
-    y_accessor: 'weight',
+    y_accessor: 'energy',
     min_y_from_data: true,
-    colors: ['blue', 'rgb(255,100,43)', '#CCCCFF', '#3465a4'],
+    colors: ['orange', 'green', 'blue', 'rgb(255,100,43)'],
   };
 
-  username = $('#members').data('currentUsername');
-  url = '/weight/api/get_multiple_weight_data/' + username;
-
+  username = $('#energy').data('currentUsername');
+  url = '/weight/api/get_nutritional_data/' + username;
+  console.log(url);
   d3.json(url, function (json) {
     var data = [];
     var legend = [];
-
+    console.log(json);
     Object.keys(json).forEach(function(key,index) {
       data[index] = MG.convert.date(json[key], 'date');
       legend.push(key);
@@ -68,7 +69,7 @@ $(document).ready(function () {
       weightChart.data = data;
       chartParams.data = data;
       chartParams.legend = legend;
-      chartParams.legend_target = '.legend';
+      chartParams.legend_target = '#energy_legend';
       MG.data_graphic(chartParams);
     }
   });

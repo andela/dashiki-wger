@@ -8,6 +8,7 @@
 {#        #}
 {% block header %}
     <script src="{% static 'js/compare_weight.js' %}"></script>
+    <script src="{% static 'js/compare_energy.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -77,6 +78,31 @@
               </div>
             {% endfor %}
         </div>
+        <hr/>
+        <h3>Nutritional Data</h3>
+        <!-- Energy Graph -->
+        <div id="energy" data-current-username="{{ users }}"></div>
+        <div id="energy_diagram"></div>
+        <div id="energy_legend"></div>
+        <hr/>
 
+        <!-- Energy Graph -->
+        <div id="fat" data-current-username="{{ users }}"></div>
+        <div id="fat_diagram"></div>
+        <div id="fat_legend"></div>
+        <hr/>
+
+        <!-- Energy Graph -->
+        <div id="protein" data-current-username="{{ users }}"></div>
+        <div id="protein_diagram"></div>
+        <div id="protein_legend"></div>
+        <hr/>
+
+        <!-- Energy Graph -->
+        <div id="carbohydrates" data-current-username="{{ users }}"></div>
+        <div id="carbohydrates_diagram"></div>
+        <div id="carbohydrates_legend"></div>
+        <hr/>
+        <h4> {% trans "Nutritional Data Details" %} </h4>
     {% endif %}
 {% endblock %}

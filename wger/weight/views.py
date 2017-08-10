@@ -241,11 +241,11 @@ def get_nutritional_plans(request, user_list=None):
         return Response("Unauthorized")
 
     if user_list:
-        user_ids = user_list.split('-or-')
+        user_names = user_list.split('-or-')
     else:
         return Response("Unauthorized")
 
-    users = [User.objects.get(pk=user_id) for user_id in user_ids]
+    users = [get_object_or_404(User, username=username)for username in user_names]
     chart_data = {}
 
     for user in users:
