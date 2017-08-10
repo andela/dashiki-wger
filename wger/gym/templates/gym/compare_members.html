@@ -10,6 +10,7 @@
     <script src="{% static 'js/compare_weight.js' %}"></script>
     <script src="{% static 'js/compare_energy.js' %}"></script>
     <script src="{% static 'js/compare_fat.js' %}"></script>
+    <script src="{% static 'js/compare_protein.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -87,19 +88,19 @@
         <div id="energy_legend"></div>
         <hr/>
 
-        <!-- Energy Graph -->
+        <!-- Fat Graph -->
         <div id="fat" data-current-username="{{ users }}"></div>
         <div id="fat_diagram"></div>
         <div id="fat_legend"></div>
         <hr/>
 
-        <!-- Energy Graph -->
+        <!-- Protein Graph -->
         <div id="protein" data-current-username="{{ users }}"></div>
         <div id="protein_diagram"></div>
         <div id="protein_legend"></div>
         <hr/>
 
-        <!-- Energy Graph -->
+        <!-- Carbohydrates Graph -->
         <div id="carbohydrates" data-current-username="{{ users }}"></div>
         <div id="carbohydrates_diagram"></div>
         <div id="carbohydrates_legend"></div>
