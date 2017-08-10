@@ -169,8 +169,8 @@ def get_weight_data(request, username=None):
     Process the data to pass it to the JS libraries to generate an SVG image
     '''
     current_user = request.user
-    if (current_user.has_perm('gym.manage_gym')
-        or current_user.has_perm('gym.gym_trainer')):
+    if current_user.has_perm('gym.manage_gym') \
+            or current_user.has_perm('gym.gym_trainer'):
         user = get_object_or_404(User, username=username)
     else:
         is_owner, user = check_access(request.user, username)
@@ -210,7 +210,7 @@ def get_multiple_weight_data(request, user_list=None):
     date_max = request.GET.get('date_max', True)
 
     if (current_user.has_perm('gym.manage_gym')
-        or current_user.has_perm('gym.gym_trainer')):
+            or current_user.has_perm('gym.gym_trainer')):
         for username in usernames:
             user = get_object_or_404(User, username=username)
 
@@ -223,7 +223,7 @@ def get_multiple_weight_data(request, user_list=None):
             for i in weights:
                 my_chart_data
                 my_chart_data.append({'date': i.date,
-                                   'weight': i.weight})
+                                      'weight': i.weight})
             chart_data[username] = my_chart_data
 
     # Return the results to the client
@@ -237,7 +237,7 @@ def get_nutritional_plans(request, user_list=None):
     '''
     current_user = request.user
     if (not current_user.has_perm('gym.manage_gym')
-        or not current_user.has_perm('gym.gym_trainer')):
+            or not current_user.has_perm('gym.gym_trainer')):
         return Response("Unauthorized")
 
     if user_list:
@@ -249,7 +249,9 @@ def get_nutritional_plans(request, user_list=None):
     chart_data = {}
 
     for user in users:
-        nutritional_plan = [plan for plan in NutritionPlan.objects.filter(user=user).order_by('creation_date')[:5]]
+        nutritional_plan = [plan for plan in
+                            NutritionPlan.objects.filter(user=user).
+                            order_by('creation_date')[:5]]
         data = []
         for plan in nutritional_plan:
             data.append({
