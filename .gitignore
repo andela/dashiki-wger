@@ -70,3 +70,4 @@ package-lock.json
 *.swp
 
 test.txt
+.DS_Store
