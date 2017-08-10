@@ -55,11 +55,9 @@ $(document).ready(function () {
 
   username = $('#carbohydrates').data('currentUsername');
   url = '/weight/api/get_nutritional_data/' + username;
-  console.log(url);
   d3.json(url, function (json) {
     var data = [];
     var legend = [];
-    console.log(json);
     Object.keys(json).forEach(function(key,index) {
       data[index] = MG.convert.date(json[key], 'date');
       legend.push(key);

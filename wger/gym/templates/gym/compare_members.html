@@ -172,3 +172,286 @@
         </div>
     {% endif %}
 {% endblock %}
+
+
+{% block sidebar %}
+    <h4>{% trans "Details" %}</h4>
+    {% if perms.gym.manage_gyms or perms.gym.manage_gym %}
+        <ul class="nav nav-tabs">
+            {% for user in weight_entries.keys %}
+              <li><a data-toggle="tab" href="#side{{ user.username }}">{{ user.username }}</a></li>
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+            {% for user in weight_entries.keys %}
+                <div id="side{{ user.username }}" class="tab-pane fade">
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
+                            {% trans "Actions" %} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="{% url 'core:user:edit' user.id %}" class="wger-modal-dialog">{% trans "Edit"%}</a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                {% if user.is_active %}
+                                    <a href="{% url 'core:user:deactivate' user.id %}" >{% trans "Deactivate user"%}</a>
+                                {% else %}
+                                    <a href="{% url 'core:user:activate' user.id %}">{% trans "Activate user"%}</a>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <a data-url="{% url 'gym:gym:reset-user-password' user.id %}"
+                                   data-toggle="modal" data-target="#confirmation-modal">{% trans "Reset user password" %}</a>
+                            </li>
+                            {% if perms.gym.manage_gym or perms.gym.manage_gyms %}
+                                {% if user.userprofile.gym %}
+                                    <li>
+                                        <a href="{% url 'gym:gym:edit-user-permission' user.id %}" class="wger-modal-dialog">
+                                            {% trans "Roles"%}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                            <li>
+                                <a href="{% url 'core:user:delete' user.id %}" class="wger-modal-dialog">
+                                    {% trans "Delete"%}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="confirmation-modal" class="modal fade" tabindex="-1" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title">{% trans 'Password reset confirmation' %}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>{% trans 'Do you really want to change this user&#39;s password?' %}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans 'No' %}</button>
+                                    <button type="button" class="btn btn-success">{% trans 'Yes' %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                    $(document).ready(function() {
+                        $('#confirmation-modal').on('show.bs.modal', function (event) {
+                            var button = $(event.relatedTarget);
+                            var url = button.data('url')
+                            var modal = $(this);
+
+                            modal.find('button.btn-success').click(function() {
+                                window.location.href = url;
+                            });
+                        });
+                    });
+                    </script>
+
+                    <table class="table">
+                        <tr>
+                            <td>{% trans "Nr." %}</td>
+                            <td>{{user.id}}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Name" %}</td>
+                            <td>{{user.first_name}}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Last name" %}</td>
+                            <td>{{user.last_name}}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Email" %}</td>
+                            <td>
+                                {% if current_user.email %}
+                                    <a href="mailto:{{user.email}}">{{user.email}}</a>
+                                {% else %}
+                                    -/-
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Phone" %}</td>
+                            <td> {{ user.userprofile.address.phone|default:'-/-' }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Address" %}</td>
+                            <td>
+                                {% if not user.userprofile.address.zip_code and not user.userprofile.address.city and not user.userprofile.address.street %}
+                                    -/-
+                                {% else %}
+                                    {{user.userprofile.address.zip_code}}
+                                    {{user.userprofile.address.city}}
+                                    {{user.userprofile.address.street}}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Registered" %}</td>
+                            <td>{{user.date_joined}}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Last login" %}</td>
+                            <td>{{user.last_login}}</td>
+                        </tr>
+                        <tr {% if not user.is_active %}class="danger"{% endif%}>
+                            <td>{% trans "Status" %}</td>
+                            <td>
+                                {% if user.is_active %}
+                                    {% trans "Active" %}
+                                {% else %}
+                                    {% trans "Inactive" %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                    {#          #}
+                    {# Contract #}
+                    {#          #}
+                    {% if perms.gym.add_contract %}
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
+                            {% trans "Actions" %} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="{% url 'gym:contract:list' user.id %}">{% trans "Overview"%}</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'gym:contract:add' user.pk %}">{% trans "Add"%}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4>{% trans "Contracts" %}
+                        <small>
+                            ({% blocktrans with number=5 %}last {{ number }}{% endblocktrans %})
+                        </small>
+                    </h4>
+                    <table class="table">
+                        {% for contract in contracts %}
+                        <tr>
+                            <td>
+                                {{ contract }}
+                            </td>
+                            <td {% if not contract.is_active %}style="text-decoration: line-through;" {% endif %}>
+                                <a href="{{ contract.get_absolute_url }}">{{ contract.date_start }}</a>
+                            </td>
+                            <td>
+                                {{ contract.amount }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td>
+                                {% trans "Nothing found" %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
+                    {#             #}
+                    {# Admin notes #}
+                    {#             #}
+                    {% if perms.gym.add_adminusernote %}
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
+                            {% trans "Actions" %} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="{% url 'gym:admin_note:list' user.id %}">{% trans "Overview" %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'gym:admin_note:add' user.id %}" class="wger-modal-dialog">{% trans "Add"%}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4>{% trans "Notes" %} <small>({% blocktrans with number=5 %}last {{ number }}{% endblocktrans %})</small></h4>
+                    <table class="table">
+                        {% for note in admin_notes %}
+                        <tr>
+                            <td>
+                                {{ note.timestamp_created }}
+                            </td>
+                            <td>
+                                {{ note.note|truncatewords:10 }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td>
+                                {% trans "Nothing found" %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
+
+                    {#           #}
+                    {# Documents #}
+                    {#           #}
+                    {% if perms.gym.add_userdocument %}
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
+                            {% trans "Actions" %} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="{% url 'gym:document:list' user.id %}">{% trans "Overview" %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'gym:document:add' user.id %}">{% trans "Add"%}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4>{% trans "Documents" %}
+                        <small>
+                            ({% blocktrans with number=5 %}last {{ number }}{% endblocktrans %})
+                        </small>
+                    </h4>
+                    <table class="table">
+                        {% for document in user.userdocument_member.all %}
+                            <tr>
+                                <td>
+                                    <a href="{{ document.document.url }}"
+                                       class="btn btn-default btn-xs"
+                                       title="{% trans 'Download' %}"
+                                       download="{{ document.original_name }}">
+                                        <span class="glyphicon glyphicon-download"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ document.timestamp_created }}
+                                </td>
+                                <td>
+                                    {{ document.name }}
+                                </td>
+                            </tr>
+                                {% empty %}
+                            <tr>
+                                <td>
+                                    {% trans "Nothing found" %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
