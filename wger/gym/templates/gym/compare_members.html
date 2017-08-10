@@ -82,6 +82,7 @@
             {% endfor %}
         </div>
         <hr/>
+
         <h3>Nutritional Data</h3>
         <!-- Energy Graph -->
         <div id="energy" data-current-username="{{ users }}"></div>
@@ -107,5 +108,67 @@
         <div id="carbohydrates_legend"></div>
         <hr/>
         <h4> {% trans "Nutritional Data Details" %} </h4>
+        <ul class="nav nav-tabs">
+            {% for user in nutrition_plans.keys %}
+              <li><a data-toggle="tab" href="#nutrition{{ user.username }}">{{ user.username }}</a></li>
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+            {% for user, plans in nutrition_plans.items %}
+              <div id="nutrition{{ user.username }}" class="tab-pane fade">
+                  <p>
+                    <table class="table">
+                    <thead>
+                    <tr>
+                        <th style="width: 25%;">{% trans "Date" %}</th>
+                        <th>{% trans "Description" %}</th>
+                        <th>{% trans "Energy" %}</th>
+                        <th>{% trans "Protein" %}</th>
+                        <th>{% trans "Carbohydrates" %}</th>
+                        <th>{% trans "Fat" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for nutrition_plan in plans %}
+                    <tr>
+                        <td>
+                            {{nutrition_plan.creation_date}}
+                        </td>
+                        <td>
+                            <a href="{{trainer_login}}?next={{ nutrition_plan.get_absolute_url }}">
+                                {{nutrition_plan}}
+                            </a>
+                        </td>
+                        <td>
+                            {{nutrition_plan.get_nutritional_values.total.energy|floatformat}}
+                            {% trans "kcal" %}
+                        </td>
+                        <td>
+                            {{nutrition_plan.get_nutritional_values.total.protein|floatformat}}
+                            {% trans_weight_unit 'g' current_user %}
+                        </td>
+                        <td>
+                            {{nutrition_plan.get_nutritional_values.total.carbohydrates|floatformat}}
+                            {% trans_weight_unit 'g' current_user %}
+                        </td>
+                        <td>
+                            {{nutrition_plan.get_nutritional_values.total.fat|floatformat}}
+                            {% trans_weight_unit 'g' current_user %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            {% trans "Nothing found" %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                  </p>
+              </div>
+            {% endfor %}
+        </div>
     {% endif %}
 {% endblock %}

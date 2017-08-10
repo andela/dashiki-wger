@@ -132,7 +132,7 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         weight_entries = {user: WeightEntry.objects.filter(user=user).order_by('-date')[:5]
                           for user in self.users}
         context['weight_entries'] = weight_entries
-        nutritional_plans = {user: NutritionPlan.objects.filter(user=user).order_by('-create_date')[:5]
+        nutritional_plans = {user: NutritionPlan.objects.filter(user=user).order_by('creation_date')[:5]
                              for user in self.users}
         context['nutrition_plans'] = nutritional_plans
         session = {user: WeightEntry.objects.filter(user=user).order_by('-date')[:10]
