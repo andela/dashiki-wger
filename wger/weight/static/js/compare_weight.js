@@ -49,7 +49,7 @@ $(document).ready(function () {
     x_accessor: 'date',
     y_accessor: 'weight',
     min_y_from_data: true,
-    colors: ['blue', 'rgb(255,100,43)', '#CCCCFF', '#3465a4'],
+    colors: ['blue', 'rgb(255,100,43)', '#CCCCFF', '#3465a4']
   };
 
   username = $('#members').data('currentUsername');
@@ -59,7 +59,7 @@ $(document).ready(function () {
     var data = [];
     var legend = [];
 
-    Object.keys(json).forEach(function(key,index) {
+    Object.keys(json).forEach (function(key, index) {
       data[index] = MG.convert.date(json[key], 'date');
       legend.push(key);
     });

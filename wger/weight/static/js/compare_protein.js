@@ -50,7 +50,7 @@ $(document).ready(function () {
     x_accessor: 'date',
     y_accessor: 'protein',
     min_y_from_data: true,
-    colors: ['#c777aa', '#ffa541', 'blue', 'rgb(255,100,43)'],
+    colors: ['#c777aa', '#ffa541', 'blue', 'rgb(255,100,43)']
   };
 
   username = $('#protein').data('currentUsername');
@@ -58,7 +58,7 @@ $(document).ready(function () {
   d3.json(url, function (json) {
     var data = [];
     var legend = [];
-    Object.keys(json).forEach(function(key,index) {
+    Object.keys(json).forEach (function(key, index) {
       data[index] = MG.convert.date(json[key], 'date');
       legend.push(key);
     });
