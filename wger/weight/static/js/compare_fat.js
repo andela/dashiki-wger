@@ -58,7 +58,7 @@ $(document).ready(function () {
   d3.json(url, function (json) {
     var data = [];
     var legend = [];
-    Object.keys(json).forEach (function(key, index) {
+    Object.keys(json).forEach(function (key, index) {
       data[index] = MG.convert.date(json[key], 'date');
       legend.push(key);
     });
