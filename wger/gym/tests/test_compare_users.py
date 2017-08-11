@@ -13,41 +13,69 @@ class CompareUserDataTestCase(WorkoutManagerTestCase):
     '''
     Test the representation of a model
     '''
+    USER_1 = {
+            'first_name': 'Cletus',
+            'last_name': 'Spuckle',
+            'username': 'cletus',
+            'email': 'cletus@testing.com',
+            'role': 'admin'}
+
+    USER_2 = {
+            'first_name': 'John',
+            'last_name': 'Speke',
+            'username': 'speke',
+            'email': 'speke@testing.com',
+            'role': 'admin'}
 
     def add_user(self, data):
         '''
         Helper function to add users
         '''
-
-        response = self.client.post(reverse('gym:gym:add-user', kwargs={'gym_pk': 1}), data)
+        self.client.post(reverse('gym:gym:add-user', kwargs={'gym_pk': 1}), data)
 
         new_user = User.objects.get(pk=self.client.session['gym.user']['user_pk'])
         return new_user
 
-    def add_weight(self, user_id):
-        response = WeightEntry.objects.create(
-            weight=decimal.Decimal(81.1).quantize(TWOPLACES),
-            date=datetime.date(2013, 2, 1),
+    def add_weight(self, user_id, weight, date):
+        '''
+        Helper function to add weight to users
+        '''
+        WeightEntry.objects.create(
+            weight=decimal.Decimal(weight).quantize(TWOPLACES),
+            date=datetime.datetime.strptime(date, "%d%m%Y").date(),
             user=user_id
         )
 
-    def test_select_members(self):
+    def test_multiple_weight_api_fail(self):
+        self.user_login('admin')
+        response = self.client.get(reverse('weight:multiple-weight-data',
+                                           kwargs={'user_list': 'wrong_user'}))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('Not found.', str(response.data))
+
+    def test_multiple_weight_api(self):
         '''
-        Test that the representation of an object is correct
+        Test that the multiple weight api returns the correct values
         '''
         self.user_login('admin')
-        user1 = self.advd_user({
-            'first_name': 'Cletus',
-            'last_name': 'Spuckle',
-            'username': 'cletus',
-            'email': 'cletus@testing.com',
-            'role': 'admin'})
-        self.add_weight(user1)
+        user1 = self.add_user(self.USER_1)
+        user2 = self.add_user(self.USER_2)
+        self.add_weight(user1, 79.3, '05072017')
+        self.add_weight(user1, 89.5, '07072017')
+        self.add_weight(user2, 59.3, '05072017')
+        self.add_weight(user2, 69.2, '07072017')
 
-        # user2 = self.add_user({
-        #     'first_name': 'John',
-        #     'last_name': 'Speke',
-        #     'username': 'speke',
-        #     'email': 'speke@testing.com',
-        #     'role': 'admin'})
+        response = self.client.get(reverse(
+            'weight:multiple-weight-data',
+            kwargs={'user_list': user1.username + '-or-' + user2.username}
+        ))
+        response_str = str(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('79.3', response_str)
+        self.assertIn('89.5', response_str)
+        self.assertIn('59.3', response_str)
+        self.assertIn('69.2', response_str)
+
+        self.user_logout()
 
