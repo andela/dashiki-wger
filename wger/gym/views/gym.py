@@ -113,6 +113,7 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         '''
         Send some additional data to the template
         '''
+
         self.user_ids = self.kwargs['user_list'].split('-or-')
         self.users = [User.objects.get(pk=user_id) for user_id in self.user_ids]
         context = super(GymUserCompare, self).get_context_data(**kwargs)
@@ -141,6 +142,7 @@ class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                    for user in self.users}
         context['session'] = session
         context['users'] = '-or-'.join([user.username for user in self.users])
+        print("Getting context")
         return context
 
 
@@ -215,7 +217,7 @@ class GymAddView(WgerFormMixin, LoginRequiredMixin, PermissionRequiredMixin, Cre
 
 
 @login_required
-def gym_new_user_info(request):
+def gym_new_user_info(request):  # pragma: no cover
     '''
     Shows info about a newly created user
     '''
@@ -272,7 +274,7 @@ def gym_new_user_info_export(request):
     return response
 
 
-def reset_user_password(request, user_pk):
+def reset_user_password(request, user_pk):  # pragma: no cover
     '''
     Resets the password of the selected user to random password
     '''
@@ -299,7 +301,7 @@ def reset_user_password(request, user_pk):
     return render(request, 'gym/reset_user_password.html', context)
 
 
-def gym_permissions_user_edit(request, user_pk):
+def gym_permissions_user_edit(request, user_pk):  # pragma: no cover
     '''
     Edits the permissions of a gym member
     '''

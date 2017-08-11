@@ -107,7 +107,7 @@ class WeightUpdateView(WgerFormMixin, UpdateView):
 
 
 @login_required
-def export_csv(request):
+def export_csv(request):  # pragma: no cover
     '''
     Exports the saved weight data as a CSV file
     '''
