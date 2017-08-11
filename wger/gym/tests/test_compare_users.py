@@ -68,9 +68,10 @@ class CompareUserDataTestCase(WorkoutManagerTestCase):
 
         response = self.client.get(reverse(
             'weight:multiple-weight-data',
-            kwargs={'user_list': user1.username + '-or-' + user2.username}
+            kwargs={'user_list': '{}-or-{}'.format(user1.username, user2.username)}
         ))
-        response_str = str(response)
+        response_str = str(response.data)
+
         self.assertEqual(response.status_code, 200)
         self.assertIn('79.3', response_str)
         self.assertIn('89.5', response_str)
@@ -79,3 +80,20 @@ class CompareUserDataTestCase(WorkoutManagerTestCase):
 
         self.user_logout()
 
+    def test_compare_weight(self):
+        self.user_login('admin')
+        user1 = self.add_user(self.USER_1)
+        user2 = self.add_user(self.USER_2)
+        self.add_weight(user1, 79.3, '05072017')
+        self.add_weight(user1, 89.5, '07072017')
+        self.add_weight(user2, 59.3, '05072017')
+        self.add_weight(user2, 69.2, '07072017')
+
+        response = self.client.get(reverse(
+            'gym:gym:user-compare', kwargs={'pk': 1, 'user_list': '{}-or-{}'.format(user1.id, user2.id)}
+        ))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, user1.username)
+        self.assertContains(response, user2.username)
+        self.assertContains(response, 'Weight Details')
