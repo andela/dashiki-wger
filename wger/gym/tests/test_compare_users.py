@@ -13,19 +13,17 @@ class CompareUserDataTestCase(WorkoutManagerTestCase):
     '''
     Test the representation of a model
     '''
-    USER_1 = {
-            'first_name': 'Cletus',
-            'last_name': 'Spuckle',
-            'username': 'cletus',
-            'email': 'cletus@testing.com',
-            'role': 'admin'}
+    USER_1 = {'first_name': 'Cletus',
+              'last_name': 'Spuckle',
+              'username': 'cletus',
+              'email': 'cletus@testing.com',
+              'role': 'admin'}
 
-    USER_2 = {
-            'first_name': 'John',
-            'last_name': 'Speke',
-            'username': 'speke',
-            'email': 'speke@testing.com',
-            'role': 'admin'}
+    USER_2 = {'first_name': 'John',
+              'last_name': 'Speke',
+              'username': 'speke',
+              'email': 'speke@testing.com',
+              'role': 'admin'}
 
     def add_user(self, data):
         '''
@@ -90,7 +88,9 @@ class CompareUserDataTestCase(WorkoutManagerTestCase):
         self.add_weight(user2, 69.2, '07072017')
 
         response = self.client.get(reverse(
-            'gym:gym:user-compare', kwargs={'pk': 1, 'user_list': '{}-or-{}'.format(user1.id, user2.id)}
+            'gym:gym:user-compare',
+            kwargs={'pk': 1,
+                    'user_list': '{}-or-{}'.format(user1.id, user2.id)}
         ))
 
         self.assertEqual(response.status_code, 200)
