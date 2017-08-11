@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from wger.core.tests.base_testcase import WorkoutManagerTestCase
+from wger.nutrition.models import MealItem
 from wger.utils.constants import TWOPLACES
 from wger.weight.models import WeightEntry
 
@@ -68,14 +69,12 @@ class CompareUserDataTestCase(WorkoutManagerTestCase):
             'weight:multiple-weight-data',
             kwargs={'user_list': '{}-or-{}'.format(user1.username, user2.username)}
         ))
-        response_str = str(response.data)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn('79.3', response_str)
-        self.assertIn('89.5', response_str)
-        self.assertIn('59.3', response_str)
-        self.assertIn('69.2', response_str)
-
+        self.assertContains(response, '79.3')
+        self.assertContains(response, '89.5')
+        self.assertContains(response, '59.3')
+        self.assertContains(response, '69.2')
         self.user_logout()
 
     def test_compare_weight(self):
@@ -97,3 +96,19 @@ class CompareUserDataTestCase(WorkoutManagerTestCase):
         self.assertContains(response, user1.username)
         self.assertContains(response, user2.username)
         self.assertContains(response, 'Weight Details')
+        self.user_logout()
+
+    def test_get_nutritional_plans_api(self):
+        self.user_login('admin')
+        user1 = self.add_user(self.USER_1)
+        user2 = self.add_user(self.USER_2)
+
+        response = self.client.get(reverse(
+            'weight:nutritional-plan',
+            kwargs={'user_list': '{}-or-{}'.format(user1.username, user2.username)}
+        ))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, user1.username)
+        self.assertContains(response, user2.username)
+        self.user_logout()
