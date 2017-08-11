@@ -52,6 +52,7 @@ class CompareUserDataTestCase(WorkoutManagerTestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertIn('Not found.', str(response.data))
+        self.user_logout()
 
     def test_multiple_weight_api(self):
         '''
@@ -111,4 +112,25 @@ class CompareUserDataTestCase(WorkoutManagerTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, user1.username)
         self.assertContains(response, user2.username)
+        self.user_logout()
+
+    def test_weight_overview(self):
+        self.user_login('admin')
+        user1 = self.add_user(self.USER_1)
+        self.add_weight(user1, 79.3, '05072017')
+
+        response = self.client.get(reverse(
+            'weight:weight-data',
+            kwargs={'username': '{}'.format(user1.username)}
+        ))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 79.3)
+
+        response = self.client.get(reverse(
+            'weight:overview',
+            kwargs={'username': '{}'.format('admin')}
+        ))
+
+        self.assertEqual(response.status_code, 200)
         self.user_logout()
