@@ -38,13 +38,14 @@ class AbstractLicenseModel(models.Model):
                                 default=2)
     '''The item's license'''
 
-    license_author = models.CharField(verbose_name=_('Author'),
-                                      max_length=50,
-                                      blank=True,
-                                      null=True,
-                                      help_text=_('If you are not the author, enter the name or '
-                                                  'source here. This is needed for some licenses '
-                                                  'e.g. the CC-BY-SA.'))
+    license_author = models.CharField(
+        verbose_name=_('Author'),
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text=_('If you are not the author, enter the name or '
+                    'source here. This is needed for some licenses '
+                    'e.g. the CC-BY-SA.'))
     '''The author if it is not the uploader'''
 
 
