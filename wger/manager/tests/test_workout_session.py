@@ -22,7 +22,8 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from wger.core.tests import api_base_test
 from wger.core.tests.base_testcase import WorkoutManagerAddTestCase
 from wger.core.tests.base_testcase import WorkoutManagerEditTestCase
-from wger.core.tests.base_testcase import WorkoutManagerTestCase, WorkoutManagerDeleteTestCase
+from wger.core.tests.base_testcase import (WorkoutManagerTestCase,
+                                           WorkoutManagerDeleteTestCase)
 from wger.manager.models import Workout, WorkoutSession, WorkoutLog
 from wger.utils.cache import cache_mapper
 
@@ -38,10 +39,11 @@ class AddWorkoutSessionTestCase(WorkoutManagerAddTestCase):
     '''
 
     object_class = WorkoutSession
-    url = reverse_lazy('manager:session:add', kwargs={'workout_pk': 1,
-                                                      'year': datetime.date.today().year,
-                                                      'month': datetime.date.today().month,
-                                                      'day': datetime.date.today().day})
+    url = reverse_lazy('manager:session:add',
+                       kwargs={'workout_pk': 1,
+                               'year': datetime.date.today().year,
+                               'month': datetime.date.today().month,
+                               'day': datetime.date.today().day})
     data = {
         'user': 1,
         'workout': 1,
@@ -86,7 +88,8 @@ class WorkoutSessionModelTestCase(WorkoutManagerTestCase):
         session.workout = Workout.objects.get(pk=1)
         session.date = datetime.date.today()
         self.assertEqual('{0}'.format(session),
-                         u'{0} - {1}'.format(Workout.objects.get(pk=1), datetime.date.today()))
+                         u'{0} - {1}'.format(Workout.objects.get(pk=1),
+                                             datetime.date.today()))
 
 
 class DeleteTestWorkoutTestCase(WorkoutManagerDeleteTestCase):
@@ -108,15 +111,18 @@ class WorkoutSessionDeleteLogsTestCase(WorkoutManagerTestCase):
         self.user_login('admin')
 
         session = WorkoutSession.objects.get(pk=1)
-        count_before = WorkoutLog.objects.filter(user__username=session.user.username,
-                                                 date=session.date).count()
+        count_before = WorkoutLog.objects.filter(
+            user__username=session.user.username,
+            date=session.date).count()
         self.assertEqual(count_before, 1)
 
-        response = self.client.post(reverse('manager:session:delete',
-                                            kwargs={'pk': 1, 'logs': 'logs'}))
+        response = self.client.post(
+            reverse('manager:session:delete',
+                    kwargs={'pk': 1, 'logs': 'logs'}))
         self.assertEqual(response.status_code, 302)
-        count_after = WorkoutLog.objects.filter(user__username=session.user.username,
-                                                date=session.date).count()
+        count_after = WorkoutLog.objects.filter(
+            user__username=session.user.username,
+            date=session.date).count()
         self.assertEqual(count_after, 0)
 
 
@@ -174,13 +180,16 @@ class WorkoutLogCacheTestCase(WorkoutManagerTestCase):
         '''
         log_hash = hash((1, 2012, 10))
         self.user_login('admin')
-        self.client.get(reverse('manager:workout:calendar', kwargs={'year': 2012, 'month': 10}))
+        self.client.get(reverse('manager:workout:calendar',
+                                kwargs={'year': 2012,
+                                        'month': 10}))
 
         session = WorkoutSession.objects.get(pk=1)
         session.notes = 'Lorem ipsum'
         session.save()
 
-        self.assertFalse(cache.get(cache_mapper.get_workout_log_list(log_hash)))
+        self.assertFalse(cache.get(
+            cache_mapper.get_workout_log_list(log_hash)))
 
     def test_cache_update_session_2(self):
         '''
@@ -188,14 +197,17 @@ class WorkoutLogCacheTestCase(WorkoutManagerTestCase):
         '''
         log_hash = hash((1, 2012, 10))
         self.user_login('admin')
-        self.client.get(reverse('manager:workout:calendar', kwargs={'year': 2012, 'month': 10}))
+        self.client.get(reverse('manager:workout:calendar',
+                                kwargs={'year': 2012,
+                                        'month': 10}))
 
         # Session is from 2014
         session = WorkoutSession.objects.get(pk=2)
         session.notes = 'Lorem ipsum'
         session.save()
 
-        self.assertTrue(cache.get(cache_mapper.get_workout_log_list(log_hash)))
+        self.assertTrue(
+            cache.get(cache_mapper.get_workout_log_list(log_hash)))
 
     def test_cache_delete_session(self):
         '''
@@ -203,12 +215,15 @@ class WorkoutLogCacheTestCase(WorkoutManagerTestCase):
         '''
         log_hash = hash((1, 2012, 10))
         self.user_login('admin')
-        self.client.get(reverse('manager:workout:calendar', kwargs={'year': 2012, 'month': 10}))
+        self.client.get(reverse('manager:workout:calendar',
+                                kwargs={'year': 2012,
+                                        'month': 10}))
 
         session = WorkoutSession.objects.get(pk=1)
         session.delete()
 
-        self.assertFalse(cache.get(cache_mapper.get_workout_log_list(log_hash)))
+        self.assertFalse(
+            cache.get(cache_mapper.get_workout_log_list(log_hash)))
 
     def test_cache_delete_session_2(self):
         '''
@@ -216,12 +231,15 @@ class WorkoutLogCacheTestCase(WorkoutManagerTestCase):
         '''
         log_hash = hash((1, 2012, 10))
         self.user_login('admin')
-        self.client.get(reverse('manager:workout:calendar', kwargs={'year': 2012, 'month': 10}))
+        self.client.get(reverse('manager:workout:calendar',
+                                kwargs={'year': 2012,
+                                        'month': 10}))
 
         session = WorkoutSession.objects.get(pk=2)
         session.delete()
 
-        self.assertTrue(cache.get(cache_mapper.get_workout_log_list(log_hash)))
+        self.assertTrue(
+            cache.get(cache_mapper.get_workout_log_list(log_hash)))
 
 
 class WorkoutSessionApiTestCase(api_base_test.ApiBaseResourceTestCase):
