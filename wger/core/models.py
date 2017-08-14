@@ -189,7 +189,6 @@ make the search difficult.'''),
     send users an email once per week
     '''
 
-
     notification_language = models.ForeignKey(Language,
                                               verbose_name=_(
                                                   'Notification language'),
@@ -205,7 +204,7 @@ make the search difficult.'''),
         'Use pauses in workout timer'),
         help_text=_('Check to activate timer pauses between '
                     'exercises.'),
-                     default=True)
+        default=True)
     '''
     Switch to activate pauses in the gym view
     '''
@@ -316,7 +315,7 @@ make the search difficult.'''),
         blank=False,
         null=True,
         validators=[MinValueValidator(
-          1500), MaxValueValidator(5000)])
+            1500), MaxValueValidator(5000)])
 
     '''Basic caloric intake based on physical activity'''
 
