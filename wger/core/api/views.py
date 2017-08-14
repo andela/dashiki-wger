@@ -43,14 +43,18 @@ from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    '''
+    API endpoint for creating users
+    '''
+    is_private = True
     serializer_class = UserCreationSerializer
     queryset = User.objects.all()
 
     def create(self, request):
-        user = User.objects.get(id=str(loads(request.body.decode())['user_id']))
-        profile = UserProfile.objects.get(user=user)
+
+        profile = UserProfile.objects.get(user=self.request.user)
         if profile.can_create_via_api:
-            creator = user.username
+            creator = profile.user.username
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
                 api_user = User.objects.create_user(

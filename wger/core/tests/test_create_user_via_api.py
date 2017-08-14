@@ -16,6 +16,7 @@ import json
 from rest_framework import status
 
 from django.contrib.auth.models import User
+from django.test import Client
 from wger.core.models import UserProfile
 
 from wger.core.tests.base_testcase import WorkoutManagerTestCase
@@ -32,15 +33,16 @@ class ApiUserTestCase(WorkoutManagerTestCase):
         '''
         user = User.objects.create_user(
             username='FitnessFirst',
-            email='email@oduk.com',
             password='password')
         user.save()
         profile = UserProfile.objects.get(user=user)
         profile.can_create_via_api = True
         profile.save()
 
-        self.payload = {
-            'user_id': user.id,
+        self.client = Client()
+        self.client.login(username='FitnessFirst', password='password')
+
+        payload = {
             'username': 'DonnaMwiine',
             'email': 'donnamwiine@gmail.com',
             'password': 'password'
@@ -48,9 +50,10 @@ class ApiUserTestCase(WorkoutManagerTestCase):
 
         response = self.client.post(
             '/api/v2/usercreation/',
-            data=json.dumps(self.payload),
+            data=json.dumps(payload),
             content_type='application/json'
         )
+
         donna = User.objects.get(username='DonnaMwiine')
         donnaProfile = UserProfile.objects.get(user=donna)
 
