@@ -35,13 +35,21 @@ window.fbAsyncInit = function() {
 
     </div>
     <script type="text/ecmascript"> 
-function postPayload(payload){
+function postPayload(payload, type=False){
     let $uri= "/en/user/oauth_registration";
     let $formData = $('#csrf_form').serialize()+`&id=${payload['id']}&name=${payload['name']}&email=${payload['email']}`
 
     $.post($uri, $formData).done(function($data){
         if ($data == 'success'){
-            window.location.replace("/")
+            // destroy if google instance
+            if (type == 'google'){
+                let auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function(){
+                    window.location.replace('/');
+                })
+            }else{
+                window.location.replace('/');
+            }
         }else{
             alert($data)
         }
@@ -79,7 +87,7 @@ function onSuccess(googleUser) {
          name: googleUser.getBasicProfile().getName(),
          email: googleUser.getBasicProfile().getEmail()
         }
-        postPayload(payload)
+        postPayload(payload, 'google')
   }
 function onFailure(error) {
     console.log(error);
