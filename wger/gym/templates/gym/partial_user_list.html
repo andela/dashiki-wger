@@ -22,13 +22,7 @@ $(document).ready( function () {
             $("input:checkbox[name=selected_member]:checked").each(function(){
                 selected.push($(this).val());
             });
-            for (var i=0; i < selected.length; i++) {
-                if (i === (selected.length - 1)) {
-                    new_url += selected[i];
-                } else {
-                    new_url += selected[i] + "-or-";
-                }
-            }
+            new_url = selected.join('-or-');
             window.location = "{% url 'gym:gym:compare' pk=gym_id %}" + new_url;
         }
     </script>

@@ -225,10 +225,10 @@ def get_multiple_weight_data(request, user_list=None):
             else:
                 weights = WeightEntry.objects.filter(user=user)
             my_chart_data = []
-            for i in weights:
+            for weight in weights:
                 my_chart_data
-                my_chart_data.append({'date': i.date,
-                                      'weight': i.weight})
+                my_chart_data.append({'date': weight.date,
+                                      'weight': weight.weight})
             chart_data[username] = my_chart_data
 
     # Return the results to the client
