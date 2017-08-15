@@ -1,6 +1,9 @@
 import os, base64, requests, urllib
 import urllib.parse
 from django.conf import settings
+from requests.auth import HTTPBasicAuth
+
+from wger.fitbit.models import TokenManager
 
 
 class Fitbit():
@@ -41,15 +44,6 @@ class Fitbit():
     # Access code must be fresh (10 minutes)
     def get_access_token(self, access_code):
 
-        # Construct the authentication header
-        auth_header = base64.b64encode(
-            self.CLIENT_ID + ':' + self.CLIENT_SECRET)
-        headers = {
-            'Authorization': 'Basic %s' % auth_header,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-
-        # Paramaters for requesting tokens (auth + refresh)
         params = {
             'code': access_code,
             'grant_type': 'authorization_code',
@@ -58,20 +52,30 @@ class Fitbit():
         }
 
         # Place request
-        resp = requests.post(self.TOKEN_URL, data=params, headers=headers)
-        status_code = resp.status_code
-        resp = resp.json()
+        response = requests.post(
+            self.TOKEN_URL, auth=HTTPBasicAuth(
+                self.CLIENT_ID, self.CLIENT_SECRET), data=params)
+
+        status_code = response.status_code
+        response = response.json()
 
         if status_code != 200:
             raise Exception("Something went wrong exchanging code for"
                             " token (%s): %s" %
-                            (resp['errors'][0]['errorType'],
-                             resp['errors'][0]['message']))
+                            (response['errors'][0]['errorType'],
+                             response['errors'][0]['message']))
 
         # Strip the goodies
         token = dict()
-        token['access_token'] = resp['access_token']
-        token['refresh_token'] = resp['refresh_token']
+        token['access_token'] = response['access_token']
+        token['refresh_token'] = response['refresh_token']
+
+        # Save token data to the database
+        user_token = TokenManager(
+            refresh_token=response['refresh_token'],
+            access_token=response['access_token']
+        )
+        user_token.save()
 
         return token
 
@@ -143,3 +147,6 @@ class Fitbit():
             raise Exception("Something went wrong requesting"
                             " (%s): %s" % (resp['errors'][0]['errorType'],
                                            resp['errors'][0]['message']))
+
+    def string_to_base64(self, text):
+        return base64.b64encode(text.encode('utf-8'))
