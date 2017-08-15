@@ -63,7 +63,7 @@ class MealItemCreateView(WgerFormMixin, CreateView):
         '''
         Check that the user owns the meal
         '''
-        self.meal_id = kwargs['meal_id']
+        self.meal_id = kwargs.get('meal_id', None)
         if self.meal_id:
             meal = get_object_or_404(Meal, pk=self.meal_id)
             if meal.plan.user == request.user:
@@ -73,9 +73,8 @@ class MealItemCreateView(WgerFormMixin, CreateView):
             else:
                 return HttpResponseForbidden()
         else:
-            plan_pk = 12
             plan = get_object_or_404(
-                NutritionPlan, pk=plan_pk, user=self.request.user)
+                NutritionPlan, pk=kwargs['plan_pk'], user=self.request.user)
             meal = Meal.objects.create(plan=plan, order=1)
             self.meal = meal
             return super(
