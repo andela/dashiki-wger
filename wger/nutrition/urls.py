@@ -82,7 +82,7 @@ patterns_meal_item = [
     url(r'^(?P<meal_id>\d+)/item/add/$',
         login_required(meal_item.MealItemCreateView.as_view()),
         name='add'),
-    url(r'^(?P<plan_pk>\d+)/item/add/$',
+    url(r'^(?P<plan_pk>\d+)/new-meal/add/$',
         login_required(meal_item.MealItemCreateView.as_view()),
         name='add-new-meal'),
     url(r'^(?P<pk>\d+)/edit/$',
