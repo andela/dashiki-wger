@@ -150,29 +150,18 @@ def delete(request, user_pk=None):
         if form.is_valid():
 
             user.delete()
-<<<<<<< HEAD
-            messages.success(request,
-                             _(
-                                 'Account "{0}" was successfully deleted').format(user.username))
-=======
             messages.success(
                 request,
                 ('Account "{0}" was successfully deleted').format(
                     user.username))
->>>>>>> [#149466959] Fix lint errors
 
             if not user_pk:
                 django_logout(request)
                 return HttpResponseRedirect(reverse('software:features'))
             else:
                 gym_pk = request.user.userprofile.gym_id
-<<<<<<< HEAD
-                return HttpResponseRedirect(
-                    reverse('gym:gym:user-list', kwargs={'pk': gym_pk}))
-=======
                 return HttpResponseRedirect(reverse(
                     'gym:gym:user-list', kwargs={'pk': gym_pk}))
->>>>>>> [#149466959] Fix lint errors
     context = {'form': form,
                'user_delete': user,
                'form_action': form_action}
@@ -214,13 +203,8 @@ def trainer_login(request, user_pk):
     # Note: it seems we have to manually set the authentication backend here
     # - https://docs.djangoproject.com/en/1.6/topics/auth/default/
     # #auth-web-requests
-<<<<<<< HEAD
-    # - http://stackoverflow.com/questions
-    # /3807777/django-login-without-authenticating
-=======
     # - http://stackoverflow.com/questions/3807777/
     # django-login-without-authenticating
->>>>>>> [#149466959] Fix lint errors
     if own:
         del(request.session['trainer.identity'])
     user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -233,15 +217,9 @@ def trainer_login(request, user_pk):
         else:
             return HttpResponseRedirect(reverse('core:index'))
     else:
-<<<<<<< HEAD
-        return HttpResponseRedirect(
-            reverse('gym:gym:user-list',
-                    kwargs={'pk': user.userprofile.gym_id}))
-=======
         return HttpResponseRedirect(reverse(
             'gym:gym:user-list',
             kwargs={'pk': user.userprofile.gym_id}))
->>>>>>> [#149466959] Fix lint errors
 
 
 def logout(request):
@@ -390,16 +368,10 @@ class UserDeactivateView(LoginRequiredMixin,
         if not request.user.is_authenticated():
             return HttpResponseForbidden()
 
-<<<<<<< HEAD
-        if (request.user.has_perm(
-            'gym.manage_gym') or request.user.has_perm('gym.gym_trainer')) \
-                and edit_user.userprofile.gym_id != request.user.userprofile.gym_id:
-=======
         if (request.user.has_perm('gym.manage_gym') or
                 request.user.has_perm('gym.gym_trainer')) \
                 and edit_user.userprofile.gym_id != \
                 request.user.userprofile.gym_id:
->>>>>>> [#149466959] Fix lint errors
             return HttpResponseForbidden()
 
         return super(
@@ -434,17 +406,11 @@ class UserActivateView(LoginRequiredMixin,
         if not request.user.is_authenticated():
             return HttpResponseForbidden()
 
-<<<<<<< HEAD
-        if (request.user.has_perm(
-            'gym.manage_gym') or request.user.has_perm('gym.gym_trainer')) \
-                and edit_user.userprofile.gym_id != request.user.userprofile.gym_id:
-=======
         if (request.user.has_perm('gym.manage_gym') or request.
                 user.has_perm('gym.gym_trainer')) \
                 and \
                 edit_user.userprofile.gym_id \
                 != request.user.userprofile.gym_id:
->>>>>>> [#149466959] Fix lint errors
             return HttpResponseForbidden()
 
         return super(UserActivateView, self).dispatch(request, *args, **kwargs)
@@ -530,13 +496,8 @@ def api_key(request):
     return render(request, 'user/api_key.html', context)
 
 
-<<<<<<< HEAD
-class UserDetailView(LoginRequiredMixin,
-                     WgerMultiplePermissionRequiredMixin, DetailView):
-=======
 class UserDetailView(
         LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, DetailView):
->>>>>>> [#149466959] Fix lint errors
     '''
     User overview for gyms
     '''
@@ -558,13 +519,8 @@ class UserDetailView(
         if not user.is_authenticated():
             return HttpResponseForbidden()
 
-<<<<<<< HEAD
-        if (user.has_perm(
-            'gym.manage_gym') or user.has_perm('gym.gym_trainer')) \
-=======
         if (user.has_perm('gym.manage_gym') or user.
                 has_perm('gym.gym_trainer')) \
->>>>>>> [#149466959] Fix lint errors
                 and not user.has_perm('gym.manage_gyms') \
                 and user.userprofile.gym != self.get_object().userprofile.gym:
             return HttpResponseForbidden()
