@@ -252,6 +252,7 @@ class OauthUserLoginTestCase(WorkoutManagerTestCase):
             reverse('core:user:oauth_registration'), payload)
         self.assertTrue(login.status_code, 200)
 
-        # but notice that user cout remains the same, so no user was created but current was logged in
+        # but notice that user cout remains the same, so no user
+        # was created but current was logged in
         self.assertTrue(User.objects.count() -
                         reg_user_increase, initial_count)
