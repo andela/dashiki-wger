@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n staticfiles wger_extras django_bootstrap_breadcrumbs %}
+
+{% block title %}{% trans "Fitbit weights" %}{% endblock %}
+
+
+
+{% block content %}
+<div class="list-group">
+    {% for exercise in exercises %}
+        <li class="list-group-item ">
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
+                    <span class="{% fa_class 'cog' %}"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    {% if perms.gym.change_contract %}
+                    <li>
+                        <a href="#">
+                            {% trans 'Edit' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            {% trans 'Show' %}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+            {{ exercises }}
+
+        </li>
+    {% empty %}
+        <li class="list-group-item">
+            {% trans "Nothing found" %}
+        </li>
+    {% endfor %}
+</div>
+{% endblock %}
