@@ -4,7 +4,14 @@
 {% load wger_extras %}
 
 
-{% block title %}{% trans "Edit meal item" %}{% endblock %}
+{% block title %}
+    {% if plan_pk %}
+        {% trans "Create new meal" %}
+    {% else %}
+        {% trans "Edit meal item" %}
+    {% endif %}
+
+{% endblock %}
 
 
 {% block header %}
