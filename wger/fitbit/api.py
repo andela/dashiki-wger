@@ -84,14 +84,6 @@ class Fitbit():
     # Get new tokens based if authentication token is expired
     def ref_access_token(self, token):
 
-        # Construct the authentication header
-        auth_header\
-            = base64.b64encode(self.CLIENT_ID + ':' + self.CLIENT_SECRET)
-        headers = {
-            'Authorization': 'Basic %s' % auth_header,
-            'Content-Type' : 'application/x-www-form-urlencoded'
-        }
-
         # Set up parameters for refresh request
         params = {
             'grant_type': 'refresh_token',
@@ -99,45 +91,48 @@ class Fitbit():
         }
 
         # Place request
-        resp = requests.post(self.TOKEN_URL, data=params, headers=headers)
+        response = requests.post(
+            self.TOKEN_URL, auth=HTTPBasicAuth(
+                self.CLIENT_ID, self.CLIENT_SECRET), data=params)
 
-        status_code = resp.status_code
-        resp = resp.json()
+        status_code = response.status_code
+        response = response.json()
 
         if status_code != 200:
             raise Exception("Something went wrong refreshing (%s): %s"
-                            % (resp['errors'][0]['errorType'],
-                            resp['errors'][0]['message']))
+                            % (response['errors'][0]['errorType'],
+                            response['errors'][0]['message']))
 
-        # Distil
-        token['access_token'] = resp['access_token']
-        token['refresh_token'] = resp['refresh_token']
+        token.access_token = response['access_token']
+        token.refresh_token = response['refresh_token']
+        token.save()
 
         return token
 
     # Place api call to retrieve data
+    # def api_call(self, token,
+    #              api_call='/1/user/-/activities/log/steps/date/today/1d.json'):
     def api_call(self, token,
-                 api_call='/1/user/-/activities/log/steps/date/today/1d.json'):
+                 api_call='/1/user/-/body/weight/date/today/1d.json'):
         # (https://dev.fitbit.com/docs/), e.g.:
         # apiCall = '/1/user/-/devices.json'
         # apiCall = '/1/user/-/profile.json'
         # apiCall = '/1/user/-/activities/date/2015-10-22.json'
 
         headers = {
-            'Authorization': 'Bearer %s' % token['access_token']
+            'Authorization': 'Bearer %s' % token.access_token
         }
 
         final_url = 'https://' + self.API_SERVER + api_call
 
-        resp = requests.get(final_url, headers=headers)
+        response = requests.get(final_url, headers=headers)
 
-        status_code = resp.status_code
+        status_code = response.status_code
 
-        resp = resp.json()
-        resp['token'] = token
+        response = response.json()
 
         if status_code == 200:
-            return resp
+            return response
         elif status_code == 401:
             print("The access token you provided has been expired let me"
                   " refresh that for you.")
@@ -147,8 +142,5 @@ class Fitbit():
             self.api_call(token, api_call)
         else:
             raise Exception("Something went wrong requesting"
-                            " (%s): %s" % (resp['errors'][0]['errorType'],
-                                           resp['errors'][0]['message']))
-
-    def string_to_base64(self, text):
-        return base64.b64encode(text.encode('utf-8'))
+                            " (%s): %s" % (response['errors'][0]['errorType'],
+                                           response['errors'][0]['message']))
