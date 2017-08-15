@@ -23,7 +23,7 @@ from django.utils.translation import ugettext_lazy
 from django.views.generic import CreateView, UpdateView
 
 from wger.nutrition.forms import MealItemForm
-from wger.nutrition.models import Meal, MealItem
+from wger.nutrition.models import Meal, MealItem, NutritionPlan
 from wger.utils.generic_views import WgerFormMixin
 
 
@@ -57,18 +57,29 @@ class MealItemCreateView(WgerFormMixin, CreateView):
     model = MealItem
     form_class = MealItemForm
     template_name = 'meal_item/edit.html'
+    meal_id = None
 
     def dispatch(self, request, *args, **kwargs):
         '''
         Check that the user owns the meal
         '''
-        meal = get_object_or_404(Meal, pk=kwargs['meal_id'])
-        if meal.plan.user == request.user:
+        self.meal_id = kwargs['meal_id']
+        if self.meal_id:
+            meal = get_object_or_404(Meal, pk=self.meal_id)
+            if meal.plan.user == request.user:
+                self.meal = meal
+                return super(
+                    MealItemCreateView, self).dispatch(request, *args, **kwargs)
+            else:
+                return HttpResponseForbidden()
+        else:
+            plan_pk = 12
+            plan = get_object_or_404(
+                NutritionPlan, pk=plan_pk, user=self.request.user)
+            meal = Meal.objects.create(plan=plan, order=1)
             self.meal = meal
             return super(
                 MealItemCreateView, self).dispatch(request, *args, **kwargs)
-        else:
-            return HttpResponseForbidden()
 
     def get_success_url(self):
         return reverse('nutrition:plan:view', kwargs={'id': self.meal.plan.id})
@@ -88,6 +99,11 @@ class MealItemCreateView(WgerFormMixin, CreateView):
         '''
         Manually set the corresponding meal
         '''
+        if not self.meal_id:
+            time = form.cleaned_data['time']
+            self.meal.time = time
+            self.meal.save()
+
         form.instance.meal = self.meal
         form.instance.order = 1
         return super(MealItemCreateView, self).form_valid(form)
