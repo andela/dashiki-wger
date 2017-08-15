@@ -42,7 +42,7 @@ class Fitbit():
 
     # Tokes are requested based on access code.
     # Access code must be fresh (10 minutes)
-    def get_access_token(self, access_code):
+    def get_access_token(self, access_code, user):
 
         params = {
             'code': access_code,
@@ -73,7 +73,9 @@ class Fitbit():
         # Save token data to the database
         user_token = TokenManager(
             refresh_token=response['refresh_token'],
-            access_token=response['access_token']
+            access_token=response['access_token'],
+            user=user,
+            has_fitbit_integration=True
         )
         user_token.save()
 
