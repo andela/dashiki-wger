@@ -134,6 +134,8 @@ class RegistrationTestCase(WorkoutManagerTestCase):
         response = self.client.post(
             reverse('core:user:oauth_registration'), payload)
         self.assertEqual(response.status_code, 200)
+        # test for success message
+        self.assertTrue("success" in response.content.decode().lower())
 
     def test_oauth_registration_user(self):
         count_before = User.objects.count()
