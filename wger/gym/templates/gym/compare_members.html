@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+{% load i18n staticfiles wger_extras django_bootstrap_breadcrumbs %}
+
+{% block title %} Compare members {% endblock %}
+
+{#        #}
+{# Header #}
+{#        #}
+{% block header %}
+    <script src="{% static 'js/compare_weight.js' %}"></script>
+    <script src="{% static 'js/compare_energy.js' %}"></script>
+    <script src="{% static 'js/compare_fat.js' %}"></script>
+    <script src="{% static 'js/compare_protein.js' %}"></script>
+    <script src="{% static 'js/compare_carbohydrates.js' %}"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% if current_user.userprofile.gym %}
+        {{ block.super }}
+
+        {% if perms.gym.manage_gyms %}
+            {% breadcrumb "Gyms" "gym:gym:list" %}
+        {% endif %}
+        {% breadcrumb_raw current_user.userprofile.gym "gym:gym:user-list" current_user.userprofile.gym.pk %}
+        {% breadcrumb_raw current_user|format_username "core:user:overview" current_user.pk %}
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+    {% url 'core:user:trainer-login' current_user.pk as trainer_login %}
+    {% if perms.gym.gym_trainer %}
+        <h4>{% trans "Weight" %}</h4>
+        <div id="members" data-current-username="{{ users }}"></div>
+        <div id="weight_diagram"></div>
+        <div class="legend"></div>
+        <hr/>
+        <h4> {% trans "Weight Details" %} </h4>
+
+        <ul class="nav nav-tabs">
+            {% for user in weight_entries.keys %}
+              <li><a data-toggle="tab" href="#{{ user.username }}">{{ user.username }}</a></li>
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+            {% for user, weight_list in weight_entries.items %}
+              <div id="{{ user }}" class="tab-pane fade">
+                <p>
+                  <h4>
+                    {{ user }} {% trans "Weight" %}
+                    <small>
+                        ({% blocktrans with number=5 %}last {{ number }}{% endblocktrans %})
+                    </small>
+                </h4>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">{% trans "Date" %}</th>
+                            <th>{% trans "Weight" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for weight in weight_list %}
+                        <tr>
+                            <td>
+                                {{weight.date}}
+                            </td>
+                            <td>
+                                {{weight.weight}} {% trans_weight_unit 'kg' current_user %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">{% trans "Nothing found" %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </p>
+              </div>
+            {% endfor %}
+        </div>
+        <hr/>
+
+        <h3>Nutritional Data</h3>
+        <!-- Energy Graph -->
+        <div id="energy" data-current-username="{{ users }}"></div>
+        <div id="energy_diagram"></div>
+        <div id="energy_legend"></div>
+        <hr/>
+
+        <!-- Fat Graph -->
+        <div id="fat" data-current-username="{{ users }}"></div>
+        <div id="fat_diagram"></div>
+        <div id="fat_legend"></div>
+        <hr/>
+
+        <!-- Protein Graph -->
+        <div id="protein" data-current-username="{{ users }}"></div>
+        <div id="protein_diagram"></div>
+        <div id="protein_legend"></div>
+        <hr/>
+
+        <!-- Carbohydrates Graph -->
+        <div id="carbohydrates" data-current-username="{{ users }}"></div>
+        <div id="carbohydrates_diagram"></div>
+        <div id="carbohydrates_legend"></div>
+        <hr/>
+        <h4> {% trans "Nutritional Data Details" %} </h4>
+        <ul class="nav nav-tabs">
+            {% for user in nutrition_plans.keys %}
+              <li><a data-toggle="tab" href="#nutrition{{ user.username }}">{{ user.username }}</a></li>
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+            {% for user, plans in nutrition_plans.items %}
+              <div id="nutrition{{ user.username }}" class="tab-pane fade">
+                  <p>
+                    <table class="table">
+                    <thead>
+                    <tr>
+                        <th style="width: 25%;">{% trans "Date" %}</th>
+                        <th>{% trans "Description" %}</th>
+                        <th>{% trans "Energy" %}</th>
+                        <th>{% trans "Protein" %}</th>
+                        <th>{% trans "Carbohydrates" %}</th>
+                        <th>{% trans "Fat" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for nutrition_plan in plans %}
+                    <tr>
+                        <td>
+                            {{nutrition_plan.creation_date}}
+                        </td>
+                        <td>
+                            <a href="{{trainer_login}}?next={{ nutrition_plan.get_absolute_url }}">
+                                {{nutrition_plan}}
+                            </a>
+                        </td>
+                        <td>
+                            {{nutrition_plan.get_nutritional_values.total.energy|floatformat}}
+                            {% trans "kcal" %}
+                        </td>
+                        <td>
+                            {{nutrition_plan.get_nutritional_values.total.protein|floatformat}}
+                            {% trans_weight_unit 'g' current_user %}
+                        </td>
+                        <td>
+                            {{nutrition_plan.get_nutritional_values.total.carbohydrates|floatformat}}
+                            {% trans_weight_unit 'g' current_user %}
+                        </td>
+                        <td>
+                            {{nutrition_plan.get_nutritional_values.total.fat|floatformat}}
+                            {% trans_weight_unit 'g' current_user %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            {% trans "Nothing found" %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                  </p>
+              </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+{% block sidebar %}
+    <h4>{% trans "Details" %}</h4>
+    {% if perms.gym.manage_gyms or perms.gym.manage_gym %}
+        <ul class="nav nav-tabs">
+            {% for user in weight_entries.keys %}
+              <li><a data-toggle="tab" href="#side{{ user.username }}">{{ user.username }}</a></li>
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+            {% for user in weight_entries.keys %}
+                <div id="side{{ user.username }}" class="tab-pane fade">
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
+                            {% trans "Actions" %} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="{% url 'core:user:edit' user.id %}" class="wger-modal-dialog">{% trans "Edit"%}</a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                {% if user.is_active %}
+                                    <a href="{% url 'core:user:deactivate' user.id %}" >{% trans "Deactivate user"%}</a>
+                                {% else %}
+                                    <a href="{% url 'core:user:activate' user.id %}">{% trans "Activate user"%}</a>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <a data-url="{% url 'gym:gym:reset-user-password' user.id %}"
+                                   data-toggle="modal" data-target="#confirmation-modal">{% trans "Reset user password" %}</a>
+                            </li>
+                            {% if perms.gym.manage_gym or perms.gym.manage_gyms %}
+                                {% if user.userprofile.gym %}
+                                    <li>
+                                        <a href="{% url 'gym:gym:edit-user-permission' user.id %}" class="wger-modal-dialog">
+                                            {% trans "Roles"%}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                            <li>
+                                <a href="{% url 'core:user:delete' user.id %}" class="wger-modal-dialog">
+                                    {% trans "Delete"%}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="confirmation-modal" class="modal fade" tabindex="-1" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title">{% trans 'Password reset confirmation' %}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>{% trans 'Do you really want to change this user&#39;s password?' %}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans 'No' %}</button>
+                                    <button type="button" class="btn btn-success">{% trans 'Yes' %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                    $(document).ready(function() {
+                        $('#confirmation-modal').on('show.bs.modal', function (event) {
+                            var button = $(event.relatedTarget);
+                            var url = button.data('url')
+                            var modal = $(this);
+
+                            modal.find('button.btn-success').click(function() {
+                                window.location.href = url;
+                            });
+                        });
+                    });
+                    </script>
+
+                    <table class="table">
+                        <tr>
+                            <td>{% trans "Nr." %}</td>
+                            <td>{{user.id}}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Name" %}</td>
+                            <td>{{user.first_name}}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Last name" %}</td>
+                            <td>{{user.last_name}}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Email" %}</td>
+                            <td>
+                                {% if current_user.email %}
+                                    <a href="mailto:{{user.email}}">{{user.email}}</a>
+                                {% else %}
+                                    -/-
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Phone" %}</td>
+                            <td> {{ user.userprofile.address.phone|default:'-/-' }}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Address" %}</td>
+                            <td>
+                                {% if not user.userprofile.address.zip_code and not user.userprofile.address.city and not user.userprofile.address.street %}
+                                    -/-
+                                {% else %}
+                                    {{user.userprofile.address.zip_code}}
+                                    {{user.userprofile.address.city}}
+                                    {{user.userprofile.address.street}}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Registered" %}</td>
+                            <td>{{user.date_joined}}</td>
+                        </tr>
+                        <tr>
+                            <td>{% trans "Last login" %}</td>
+                            <td>{{user.last_login}}</td>
+                        </tr>
+                        <tr {% if not user.is_active %}class="danger"{% endif%}>
+                            <td>{% trans "Status" %}</td>
+                            <td>
+                                {% if user.is_active %}
+                                    {% trans "Active" %}
+                                {% else %}
+                                    {% trans "Inactive" %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                    {#          #}
+                    {# Contract #}
+                    {#          #}
+                    {% if perms.gym.add_contract %}
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
+                            {% trans "Actions" %} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="{% url 'gym:contract:list' user.id %}">{% trans "Overview"%}</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'gym:contract:add' user.pk %}">{% trans "Add"%}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4>{% trans "Contracts" %}
+                        <small>
+                            ({% blocktrans with number=5 %}last {{ number }}{% endblocktrans %})
+                        </small>
+                    </h4>
+                    <table class="table">
+                        {% for contract in contracts %}
+                        <tr>
+                            <td>
+                                {{ contract }}
+                            </td>
+                            <td {% if not contract.is_active %}style="text-decoration: line-through;" {% endif %}>
+                                <a href="{{ contract.get_absolute_url }}">{{ contract.date_start }}</a>
+                            </td>
+                            <td>
+                                {{ contract.amount }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td>
+                                {% trans "Nothing found" %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
+                    {#             #}
+                    {# Admin notes #}
+                    {#             #}
+                    {% if perms.gym.add_adminusernote %}
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
+                            {% trans "Actions" %} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="{% url 'gym:admin_note:list' user.id %}">{% trans "Overview" %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'gym:admin_note:add' user.id %}" class="wger-modal-dialog">{% trans "Add"%}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4>{% trans "Notes" %} <small>({% blocktrans with number=5 %}last {{ number }}{% endblocktrans %})</small></h4>
+                    <table class="table">
+                        {% for note in admin_notes %}
+                        <tr>
+                            <td>
+                                {{ note.timestamp_created }}
+                            </td>
+                            <td>
+                                {{ note.note|truncatewords:10 }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td>
+                                {% trans "Nothing found" %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
+
+                    {#           #}
+                    {# Documents #}
+                    {#           #}
+                    {% if perms.gym.add_userdocument %}
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
+                            {% trans "Actions" %} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="{% url 'gym:document:list' user.id %}">{% trans "Overview" %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'gym:document:add' user.id %}">{% trans "Add"%}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h4>{% trans "Documents" %}
+                        <small>
+                            ({% blocktrans with number=5 %}last {{ number }}{% endblocktrans %})
+                        </small>
+                    </h4>
+                    <table class="table">
+                        {% for document in user.userdocument_member.all %}
+                            <tr>
+                                <td>
+                                    <a href="{{ document.document.url }}"
+                                       class="btn btn-default btn-xs"
+                                       title="{% trans 'Download' %}"
+                                       download="{{ document.original_name }}">
+                                        <span class="glyphicon glyphicon-download"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ document.timestamp_created }}
+                                </td>
+                                <td>
+                                    {{ document.name }}
+                                </td>
+                            </tr>
+                                {% empty %}
+                            <tr>
+                                <td>
+                                    {% trans "Nothing found" %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
