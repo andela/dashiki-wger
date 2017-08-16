@@ -4,9 +4,16 @@
 
 {% block title %}{% trans "Weights from your fitbit account" %}{% endblock %}
 
+{#        #}
+{# Header #}
+{#        #}
+{% block header %}
+<script src="{% static 'js/fitbit_weight.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 
+<div id="weight_diagram"></div>
 <div class="list-group">
     <table class="table">
         <tr>
