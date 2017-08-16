@@ -65,21 +65,21 @@ class Fitbit():
                             (response['errors'][0]['errorType'],
                              response['errors'][0]['message']))
 
-        # Strip the goodies
-        token = dict()
-        token['access_token'] = response['access_token']
-        token['refresh_token'] = response['refresh_token']
+        user_token = user.tokenmanager
+        if not user_token:
+            # Save token data to the database
+            user_token = TokenManager(
+                refresh_token=response['refresh_token'],
+                access_token=response['access_token'],
+                user=user,
+                has_fitbit_integration=True
+            )
+            user_token.save()
+            return
 
-        # Save token data to the database
-        user_token = TokenManager(
-            refresh_token=response['refresh_token'],
-            access_token=response['access_token'],
-            user=user,
-            has_fitbit_integration=True
-        )
+        user_token.refresh_token = response['refresh_token']
+        user_token.access_token = response['access_token']
         user_token.save()
-
-        return token
 
     # Get new tokens based if authentication token is expired
     def ref_access_token(self, token):
@@ -87,7 +87,7 @@ class Fitbit():
         # Set up parameters for refresh request
         params = {
             'grant_type': 'refresh_token',
-            'refresh_token': token['refresh_token']
+            'refresh_token': token.refresh_token
         }
 
         # Place request
@@ -101,7 +101,7 @@ class Fitbit():
         if status_code != 200:
             raise Exception("Something went wrong refreshing (%s): %s"
                             % (response['errors'][0]['errorType'],
-                            response['errors'][0]['message']))
+                               response['errors'][0]['message']))
 
         token.access_token = response['access_token']
         token.refresh_token = response['refresh_token']
@@ -110,14 +110,7 @@ class Fitbit():
         return token
 
     # Place api call to retrieve data
-    # def api_call(self, token,
-    #              api_call='/1/user/-/activities/log/steps/date/today/1d.json'):
-    def api_call(self, token,
-                 api_call='/1/user/-/body/weight/date/today/1d.json'):
-        # (https://dev.fitbit.com/docs/), e.g.:
-        # apiCall = '/1/user/-/devices.json'
-        # apiCall = '/1/user/-/profile.json'
-        # apiCall = '/1/user/-/activities/date/2015-10-22.json'
+    def api_call(self, token, api_call):
 
         headers = {
             'Authorization': 'Bearer %s' % token.access_token
@@ -138,8 +131,9 @@ class Fitbit():
                   " refresh that for you.")
             # Refresh the access token with the refresh token if expired.
             #  Access tokens should be good for 1 hour.
-            token = self.ref_access_token(token)
+            self.ref_access_token(token)
             self.api_call(token, api_call)
+
         else:
             raise Exception("Something went wrong requesting"
                             " (%s): %s" % (response['errors'][0]['errorType'],

@@ -21,19 +21,21 @@ class WeightsListView(ListView):
 
         return render(
             request, self.template_name,
-            {'exercises': self.fitbit.api_call(current_user_token)}
+            {'weights': self.fitbit.api_call(
+                current_user_token,
+                '/1/user/-/body/weight/date/today/1w.json')}
         )
 
 
 class FitbitAuthentication(ListView):
     fitbit = Fitbit()
     initial = {'key': 'value'}
-    template_name = 'exercises.html'
+    template_name = 'weights.html'
 
     def get(self, request, *args, **kwargs):
         current_user = request.user
         access_code = request.GET['code']
         self.fitbit.get_access_token(access_code, current_user)
 
-        return render(request, self.template_name, {'exercises': 'Successful'})
+        return render(request, self.template_name, {'weights': 'Successful'})
 
