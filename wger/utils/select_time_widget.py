@@ -1,6 +1,5 @@
 import re
-from django.forms.extras.widgets import SelectDateWidget
-from django.forms.widgets import Widget, Select, MultiWidget
+from django.forms.widgets import Widget, Select
 from django.utils.safestring import mark_safe
 from requests.compat import basestring
 
@@ -10,7 +9,8 @@ __all__ = ('SelectTimeWidget', 'SplitSelectDateTimeWidget')
 # Example: "12:34:56 P.M."  matches:
 # ('12', '34', ':56', '56', 'P.M.', 'P', '.', 'M', '.')
 # ('12', '34', ':56', '56', 'P.M.')
-# Note that the colon ":" before seconds is optional, but only if seconds are omitted
+# Note that the colon ":" before seconds is optional,
+# but only if seconds are omitted
 time_pattern = r'(\d\d?):(\d\d)(:(\d\d))? *([aApP]\.?[mM]\.?)?$'
 
 RE_TIME = re.compile(time_pattern)
@@ -35,11 +35,17 @@ class SelectTimeWidget(Widget):
     meridiem_field = '%s_meridiem'
     twelve_hr = False  # Default to 24hr.
 
-    def __init__(self, attrs=None, hour_step=None, minute_step=None, second_step=None, twelve_hr=False):
+    def __init__(self,
+                 attrs=None,
+                 hour_step=None,
+                 minute_step=None,
+                 second_step=None,
+                 twelve_hr=False):
         """
         hour_step, minute_step, second_step are optional step values for
         for the range of values for the associated select element
-        twelve_hr: If True, forces the output to be in 12-hr format (rather than 24-hr)
+        twelve_hr: If True, forces the output to be in 12-hr format
+        (rather than 24-hr)
         """
         self.attrs = attrs or {}
 
@@ -68,7 +74,9 @@ class SelectTimeWidget(Widget):
 
     def render(self, name, value, attrs=None):
         try:  # try to get time values from a datetime.time object (value)
-            hour_val, minute_val, second_val = value.hour, value.minute, value.second
+            hour_val, minute_val, second_val = value.hour, \
+                                               value.minute,\
+                                               value.second
             if self.twelve_hr:
                 if hour_val >= 12:
                     self.meridiem_val = 'p.m.'
@@ -79,8 +87,8 @@ class SelectTimeWidget(Widget):
             if isinstance(value, basestring):
                 match = RE_TIME.match(value)
                 if match:
-                    time_groups = match.groups();
-                    hour_val = int(time_groups[HOURS]) % 24  # force to range(0-24)
+                    time_groups = match.groups()
+                    hour_val = int(time_groups[HOURS]) % 24
                     minute_val = int(time_groups[MINUTES])
                     if time_groups[SECONDS] is None:
                         second_val = 0
@@ -99,10 +107,12 @@ class SelectTimeWidget(Widget):
                         else:
                             self.meridiem_val = None
 
-        # If we're doing a 12-hr clock, there will be a meridiem value, so make sure the
+        # If we're doing a 12-hr clock,
+        # there will be a meridiem value, so make sure the
         # hours get printed correctly
         if self.twelve_hr and self.meridiem_val:
-            if self.meridiem_val.lower().startswith('p') and hour_val > 12 and hour_val < 24:
+            if self.meridiem_val.lower().startswith('p') and \
+                        12 < hour_val < 24:
                 hour_val = hour_val % 12
         elif hour_val == 0:
             hour_val = 12
@@ -113,37 +123,46 @@ class SelectTimeWidget(Widget):
         else:
             id_ = 'id_%s' % name
 
-        # For times to get displayed correctly, the values MUST be converted to unicode
-        # When Select builds a list of options, it checks against Unicode values
+        # For times to get displayed correctly,
+        # the values MUST be converted to unicode
+        # When Select builds a list of options,
+        # it checks against Unicode values
         hour_val = u"%.2d" % hour_val
         minute_val = u"%.2d" % minute_val
         second_val = u"%.2d" % second_val
 
         hour_choices = [("%.2d" % i, "%.2d" % i) for i in self.hours]
         local_attrs = self.build_attrs(id=self.hour_field % id_)
-        select_html = Select(choices=hour_choices).render(self.hour_field % name, hour_val, local_attrs)
+        select_html = Select(choices=hour_choices)\
+            .render(self.hour_field % name, hour_val, local_attrs)
         output.append(select_html)
 
         minute_choices = [("%.2d" % i, "%.2d" % i) for i in self.minutes]
         local_attrs['id'] = self.minute_field % id_
-        select_html = Select(choices=minute_choices).render(self.minute_field % name, minute_val, local_attrs)
+        select_html = Select(choices=minute_choices)\
+            .render(self.minute_field % name, minute_val, local_attrs)
         output.append(select_html)
 
         second_choices = [("%.2d" % i, "%.2d" % i) for i in self.seconds]
         local_attrs['id'] = self.second_field % id_
-        select_html = Select(choices=second_choices).render(self.second_field % name, second_val, local_attrs)
+        select_html = Select(choices=second_choices).\
+            render(self.second_field % name, second_val, local_attrs)
         output.append(select_html)
 
         if self.twelve_hr:
-            #  If we were given an initial value, make sure the correct meridiem gets selected.
-            if self.meridiem_val is not None and self.meridiem_val.startswith('p'):
+            #  If we were given an initial value,
+            # make sure the correct meridiem gets selected.
+            if not (not (self.meridiem_val is not None)
+                    or not self.meridiem_val.startswith('p')):
                 meridiem_choices = [('p.m.', 'p.m.'), ('a.m.', 'a.m.')]
             else:
                 meridiem_choices = [('a.m.', 'a.m.'), ('p.m.', 'p.m.')]
 
             local_attrs['id'] = local_attrs['id'] = self.meridiem_field % id_
-            select_html = Select(choices=meridiem_choices).render(self.meridiem_field % name, self.meridiem_val,
-                                                                  local_attrs)
+            select_html = Select(choices=meridiem_choices).\
+                render(self.meridiem_field % name,
+                       self.meridiem_val,
+                       local_attrs)
             output.append(select_html)
 
         return mark_safe(u'\n'.join(output))
