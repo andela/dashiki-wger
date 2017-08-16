@@ -74,9 +74,9 @@ class SelectTimeWidget(Widget):
 
     def render(self, name, value, attrs=None):
         try:  # try to get time values from a datetime.time object (value)
-            hour_val, minute_val, second_val = value.hour, \
-                                               value.minute,\
-                                               value.second
+            hour_val = value.hour
+            minute_val = value.minute
+            second_val = value.second
             if self.twelve_hr:
                 if hour_val >= 12:
                     self.meridiem_val = 'p.m.'
@@ -111,8 +111,7 @@ class SelectTimeWidget(Widget):
         # there will be a meridiem value, so make sure the
         # hours get printed correctly
         if self.twelve_hr and self.meridiem_val:
-            if self.meridiem_val.lower().startswith('p') and \
-                        12 < hour_val < 24:
+            if self.meridiem_val.lower().startswith('p') and 12 < hour_val < 24:
                 hour_val = hour_val % 12
         elif hour_val == 0:
             hour_val = 12
