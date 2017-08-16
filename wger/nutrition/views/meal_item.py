@@ -57,13 +57,14 @@ class MealItemCreateView(WgerFormMixin, CreateView):
     model = MealItem
     form_class = MealItemForm
     template_name = 'meal_item/edit.html'
-    meal_id = None
+    meal_id, plan_pk = None, None
 
     def dispatch(self, request, *args, **kwargs):
         '''
         Check that the user owns the meal
         '''
         self.meal_id = kwargs.get('meal_id', None)
+        self.plan_pk = kwargs.get('plan_pk', None)
         if self.meal_id:
             meal = get_object_or_404(Meal, pk=self.meal_id)
             if meal.plan.user == request.user:
@@ -73,10 +74,6 @@ class MealItemCreateView(WgerFormMixin, CreateView):
             else:
                 return HttpResponseForbidden()
         else:
-            plan = get_object_or_404(
-                NutritionPlan, pk=kwargs['plan_pk'], user=self.request.user)
-            meal = Meal.objects.create(plan=plan, order=1)
-            self.meal = meal
             return super(
                 MealItemCreateView, self).dispatch(request, *args, **kwargs)
 
@@ -88,11 +85,16 @@ class MealItemCreateView(WgerFormMixin, CreateView):
         Send some additional data to the template
         '''
         context = super(MealItemCreateView, self).get_context_data(**kwargs)
-        context['form_action'] = reverse('nutrition:meal_item:add',
-                                         kwargs={'meal_id': self.meal.id})
+
+        if self.meal_id:
+            context['form_action'] = reverse('nutrition:meal_item:add',
+                                             kwargs={'meal_id': self.meal.id})
+        else:
+            context['form_action'] = reverse('nutrition:meal_item:add-new-meal',
+                                             kwargs={'plan_pk': self.plan_pk})
         context['ingredient_searchfield'] =\
             self.request.POST.get('ingredient_searchfield', '')
-        context['plan_pk'] = kwargs.get('plan_pk', None)
+        context['plan_pk'] = self.plan_pk
         return context
 
     def form_valid(self, form):
@@ -100,6 +102,10 @@ class MealItemCreateView(WgerFormMixin, CreateView):
         Manually set the corresponding meal
         '''
         if not self.meal_id:
+            plan = get_object_or_404(
+                NutritionPlan, pk=self.plan_pk, user=self.request.user)
+            meal = Meal.objects.create(plan=plan, order=1)
+            self.meal = meal
             time = form.cleaned_data['time']
             self.meal.time = time
             self.meal.save()
