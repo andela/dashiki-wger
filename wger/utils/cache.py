@@ -42,8 +42,10 @@ def delete_template_fragment_cache(fragment_name='', *args):
 def reset_workout_canonical_form(workout_id):
     cache.delete(cache_mapper.get_workout_canonical(workout_id))
 
+
 def reset_nutritional_values(value_id):
     cache.delete(cache_mapper.get_nutritional_values(value_id))
+
 
 def reset_workout_log(user_pk, year, month, day=None):
     '''
@@ -117,6 +119,7 @@ class CacheKeyMapper(object):
         Return the workout canonical representation
         '''
         return self.WORKOUT_LOG_LIST.format(hash_value)
+    
     def get_nutritional_values(self, param):
         '''
         Return nutritional values information

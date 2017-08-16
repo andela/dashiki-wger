@@ -1,12 +1,10 @@
 import datetime
 from django.core.cache import cache
 from wger.utils.cache import cache_mapper
-from wger.core.tests.base_testcase import (
-    WorkoutManagerTestCase
-    )
-from wger.nutrition.models import (
-    NutritionPlan
-)
+from wger.core.tests.base_testcase import WorkoutManagerTestCase
+from wger.nutrition.models import NutritionPlan
+
+
 class NutritionInfoCacheTestCase(WorkoutManagerTestCase):
     '''
     Test case for the nutrition info caching
@@ -33,7 +31,6 @@ class NutritionInfoCacheTestCase(WorkoutManagerTestCase):
 
         plan.save()
         self.assertFalse(cache.get(cache_mapper.get_nutritional_values(1)))
-
 
     def test_nutrition_info_cache_delete(self):
         '''
