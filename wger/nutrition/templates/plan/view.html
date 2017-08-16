@@ -133,7 +133,7 @@ function wgerCustomModalInit()
 {% empty %}
 {% if is_owner %}
 <p>
-     <a href="{% url 'nutrition:meal:add' plan.id %}"
+     <a href="{% url 'nutrition:meal_item:add-new-meal' plan.id %}"
         class="wger-modal-dialog btn btn-default btn-block">
             {% trans "No meals for this plan." %}
             {% trans "Add one now." %}
