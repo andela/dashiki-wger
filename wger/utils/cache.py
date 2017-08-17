@@ -119,7 +119,7 @@ class CacheKeyMapper(object):
         Return the workout canonical representation
         '''
         return self.WORKOUT_LOG_LIST.format(hash_value)
-    
+
     def get_nutritional_values(self, param):
         '''
         Return nutritional values information

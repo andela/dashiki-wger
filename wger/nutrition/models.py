@@ -119,21 +119,21 @@ class NutritionPlan(models.Model):
         result = cache.get(cache_mapper.get_nutritional_values(self.pk))
         if not result:
             unit = 'kg' if use_metric else 'lb'
-            result = {'total': {'energy': 0,
-                                'protein': 0,
-                                'carbohydrates': 0,
-                                'carbohydrates_sugar': 0,
-                                'fat': 0,
-                                'fat_saturated': 0,
-                                'fibres': 0,
-                                'sodium': 0},
-                      'percent': {'protein': 0,
-                                  'carbohydrates': 0,
-                                  'fat': 0},
-                      'per_kg': {'protein': 0,
-                                 'carbohydrates': 0,
-                                 'fat': 0},
-                     }
+            result = {
+                'total': {'energy': 0,
+                          'protein': 0,
+                          'carbohydrates': 0,
+                          'carbohydrates_sugar': 0,
+                          'fat': 0,
+                          'fat_saturated': 0,
+                          'fibres': 0,
+                          'sodium': 0},
+                'percent': {'protein': 0,
+                            'carbohydrates': 0,
+                            'fat': 0},
+                'per_kg': {'protein': 0,
+                           'carbohydrates': 0,
+                           'fat': 0}, }
 
             # Energy
             for meal in self.meal_set.select_related():
@@ -611,8 +611,7 @@ class MealItem(models.Model):
     weight_unit = models.ForeignKey(IngredientWeightUnit,
                                     verbose_name=_('Weight unit'),
                                     null=True,
-                                    blank=True,
-                                   )
+                                    blank=True,)
 
     order = models.IntegerField(verbose_name=_('Order'),
                                 blank=True,
