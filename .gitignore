@@ -66,7 +66,6 @@ node_modules
 
 wger-venv/
 package-lock.json
-**/migrations/*
 *.swp
 
 test.txt
