@@ -9,7 +9,6 @@ from wger.fitbit.models import TokenManager
 
 
 class WeightsListView(ListView):
-    initial = {'key': 'value'}
     template_name = 'weights.html'
     fitbit = Fitbit()
 
@@ -29,9 +28,28 @@ class WeightsListView(ListView):
         )
 
 
+class ActivitiesListView(ListView):
+    template_name = 'activities.html'
+    fitbit = Fitbit()
+
+    def get(self, request, *args, **kwargs):
+        current_user = request.user
+        current_user_token = current_user.tokenmanager
+        if not current_user_token or not current_user_token.has_fitbit_integration:
+            auth_url = self.fitbit.get_authorization_uri()
+
+            return redirect(auth_url)
+
+        return render(
+            request, self.template_name,
+            {'activities': self.fitbit.api_call(
+                current_user_token,
+                '/1/user/-/activities/date/today.json')}
+                # '/1/user/-/activities.json')}
+        )
+
 class FitbitAuthentication(ListView):
     fitbit = Fitbit()
-    initial = {'key': 'value'}
     template_name = 'weights.html'
 
     def get(self, request, *args, **kwargs):

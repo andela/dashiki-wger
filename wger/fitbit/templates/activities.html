@@ -2,28 +2,26 @@
 {% load filters %}
 {% load i18n staticfiles wger_extras django_bootstrap_breadcrumbs %}
 
-{% block title %}{% trans "Weights from your fitbit account" %}{% endblock %}
-
-{#        #}
-{# Header #}
-{#        #}
-{% block header %}
-<script src="{% static 'js/fitbit_weight.js' %}"></script>
-{% endblock %}
+{% block title %}{% trans "Summary of today's activities from Fitbit" %}{% endblock %}
 
 {% block content %}
 
-<div id="weight_diagram"></div>
 <div class="list-group">
     <table class="table">
         <tr>
-            <th>{% trans 'Date' %}</th>
-            <th>{% trans 'Weight' %}</th>
+            <th>{% trans 'Name' %}</th>
+            <th>{% trans 'Description' %}</th>
+            <th>{% trans 'Calories' %}</th>
+            <th>{% trans 'Start time' %}</th>
+            <th>{% trans 'Steps' %}</th>
         </tr>
-        {% for weight in weights|get:"body-weight" %}
+        {% for activity in activities|get:"activities" %}
             <tr>
-                <td>{{ weight|get:"dateTime" }}</td>
-                <td>{{ weight|get:"value" }}</td>
+                <td>{{ activity|get:"name" }}</td>
+                <td>{{ activity|get:"description" }}</td>
+                <td>{{ activity|get:"calories" }}</td>
+                <td>{{ activity|get:"startTime" }}</td>
+                <td>{{ activity|get:"steps" }}</td>
             </tr>
         {% empty %}
             <li class="list-group-item">
@@ -33,6 +31,4 @@
     </table>
 </div>
 {% endblock %}
-
-
 
