@@ -57,7 +57,8 @@ class FitbitAuthentication(ListView):
         access_code = request.GET['code']
         self.fitbit.get_access_token(access_code, current_user)
 
-        return render(request, self.template_name, {'weights': 'Successful'})
+        return render(request, self.template_name, {'weights': 'Integration '
+                                                               'Successful'})
 
 
 @api_view(['GET'])
