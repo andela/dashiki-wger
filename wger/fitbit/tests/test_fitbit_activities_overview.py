@@ -2,10 +2,10 @@ import mock
 from django.core.urlresolvers import reverse
 from mock import patch
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from wger.fitbit.api import Fitbit
 from wger.fitbit.models import TokenManager
-from django.conf import settings
 from wger.core.tests.base_testcase import WorkoutManagerTestCase
 
 
