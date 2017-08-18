@@ -1,4 +1,5 @@
-import os, base64, requests, urllib
+import requests
+import urllib
 import urllib.parse
 from django.conf import settings
 from requests.auth import HTTPBasicAuth
@@ -30,7 +31,7 @@ class Fitbit():
         # Parameters for authorization, make sure to select
         params = {
             'client_id': self.CLIENT_ID,
-            'response_type':  'code',
+            'response_type': 'code',
             'scope': ' '.join(self.API_SCOPES),
             'redirect_uri': self.REDIRECT_URI
         }

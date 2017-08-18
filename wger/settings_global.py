@@ -378,4 +378,3 @@ WGER_SETTINGS = {
 CLIENT_ID = os.environ.get('CLIENT_ID', 'FakeClientId')
 CLIENT_SECRET = os.environ.get('CLIENT_SECRET', 'FakeClientSecret')
 REDIRECT_URI = os.environ.get('REDIRECT_URI', 'FakeRedirectUrl')
-

@@ -1,11 +1,9 @@
 from django.views.generic import ListView
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from .api import Fitbit
-from wger.fitbit.models import TokenManager
 
 
 class WeightsListView(ListView):
@@ -15,7 +13,8 @@ class WeightsListView(ListView):
     def get(self, request, *args, **kwargs):
         current_user = request.user
         current_user_token = current_user.tokenmanager
-        if not current_user_token or not current_user_token.has_fitbit_integration:
+        if not current_user_token or\
+                not current_user_token.has_fitbit_integration:
             auth_url = self.fitbit.get_authorization_uri()
 
             return redirect(auth_url)
@@ -35,7 +34,8 @@ class ActivitiesListView(ListView):
     def get(self, request, *args, **kwargs):
         current_user = request.user
         current_user_token = current_user.tokenmanager
-        if not current_user_token or not current_user_token.has_fitbit_integration:
+        if not current_user_token or\
+                not current_user_token.has_fitbit_integration:
             auth_url = self.fitbit.get_authorization_uri()
 
             return redirect(auth_url)
@@ -45,8 +45,8 @@ class ActivitiesListView(ListView):
             {'activities': self.fitbit.api_call(
                 current_user_token,
                 '/1/user/-/activities/date/today.json')}
-                # '/1/user/-/activities.json')}
         )
+
 
 class FitbitAuthentication(ListView):
     fitbit = Fitbit()

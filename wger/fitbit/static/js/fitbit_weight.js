@@ -33,7 +33,6 @@ function modifyTimePeriod(data, pastNumberDays) {
 
 $(document).ready(function () {
   var url;
-  var username;
   var chartParams;
   var weightChart;
   weightChart = {};
@@ -52,21 +51,12 @@ $(document).ready(function () {
     colors: ['#3465a4']
   };
 
-  username = $('#current-username').data('currentUsername');
   url = '/fitbit/get_fitbit_weight_data/';
 
   d3.json(url, function (json) {
     var data;
-    // if (json.length) {
-    //   data = MG.convert.date(json, 'dateTime');
-    //   weightChart.data = data;
-    //
-    //   // Plot the data
-    //   chartParams.data = data;
-    //   MG.data_graphic(chartParams);
-    // }
     data = MG.convert.date(json, 'dateTime');
-    weightChart.data = data
+    weightChart.data = data;
 
     // Plot the data
     chartParams.data = data;
