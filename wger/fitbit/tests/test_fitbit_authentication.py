@@ -1,6 +1,7 @@
-import urllib
-import urllib.parse
-
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 from wger.fitbit.api import Fitbit
 from django.conf import settings
 
@@ -24,7 +25,7 @@ class FitbitAuthenticationTestCase(WorkoutManagerTestCase):
     def test_authorize_token_url(self):
         # authorize_token_url calls oauth and returns a URL
         response = self.fitbit.get_authorization_uri()
-        params = urllib.parse.urlencode({
+        params = urlencode({
             'client_id': self.CLIENT_ID,
             'response_type': 'code',
             'scope': ' '.join(self.API_SCOPES),
