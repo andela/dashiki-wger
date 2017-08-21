@@ -58,6 +58,24 @@ from wger.utils.constants import DATE_FORMATS
 from wger.utils.widgets import Html5DateInput
 
 
+class DropSetForm(ModelForm):
+
+    class Meta:
+        model = Set
+        exclude = ('order', 'exerciseday')
+        widgets = {'exercises': ExerciseAjaxSelect(), }
+
+    def __init__(self, *args, **kwargs):
+        super(DropSetForm, self).__init__(*args, **kwargs)
+        self.fields['exercises'].help_text = _('You can search for'
+                                                   'more than one exercise,'
+                                                   'they will be grouped '
+                                                   'together for a superset.')
+
+#         self.fields['exercises'].queryset = Exercise.objects.filter(
+#  +            equipment__name__in='Kettlebell' or 'Barbell' or 'Dumbbell').select_related()
+
+
 class DemoUserForm(Form):
     captcha = ReCaptchaField(attrs={'theme': 'clean'},
                              label=_('Confirmation text'),
