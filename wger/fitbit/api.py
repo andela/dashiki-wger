@@ -1,6 +1,8 @@
 import requests
-import urllib
-import urllib.parse
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 from django.conf import settings
 from requests.auth import HTTPBasicAuth
 
@@ -15,8 +17,6 @@ class Fitbit():
     REDIRECT_URI = settings.REDIRECT_URI
 
     # Decide which information the FitBit.py should have access to.
-    # Options: 'activity', 'heartrate', 'location', 'nutrition',
-    #          'profile', 'settings', 'sleep', 'social', 'weight'
     API_SCOPES = ('activity', 'heartrate', 'location', 'nutrition', 'profile',
                   'settings', 'sleep', 'social', 'weight')
 
@@ -38,7 +38,7 @@ class Fitbit():
 
         # Encode parameters and construct
         #  authorization url to be returned to user.
-        urlparams = urllib.parse.urlencode(params)
+        urlparams = urlencode(params)
         return "%s?%s" % (self.AUTHORIZE_URL, urlparams)
 
     # Tokes are requested based on access code.
