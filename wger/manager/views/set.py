@@ -54,6 +54,7 @@ SettingFormset = modelformset_factory(Setting,
                                       can_order=False,
                                       extra=1)
 
+
 @login_required
 def create_dropset(request, day_pk):
     '''
@@ -133,6 +134,7 @@ def create_dropset(request, day_pk):
     context['extend_template'] = 'base_empty.html' if request.is_ajax(
     ) else 'base.html'
     return render(request, 'set/dropset.html', context)
+
 
 @login_required
 def create(request, day_pk):
