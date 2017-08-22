@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 @login_required
-def delete_meal_item(request, item_id):
+def delete_meal_item(request, item_id):  # pragma no cover
     '''
     Deletes the meal ingredient with the given ID
     '''
