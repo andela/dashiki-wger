@@ -1,8 +1,8 @@
 import mock
 from django.core.urlresolvers import reverse
 from mock import patch
-from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib import auth
 
 from wger.fitbit.api import Fitbit
 from wger.fitbit.models import TokenManager
@@ -12,7 +12,6 @@ from wger.core.tests.base_testcase import WorkoutManagerTestCase
 class FitbitActivitiesTestCase(WorkoutManagerTestCase):
     SITE_URL = settings.SITE_URL
     fitbit = Fitbit()
-    user = User.objects.get(pk=1)
 
     @patch('wger.fitbit.api.requests.get')
     def test_fitbit_activities_overview(self, mock_api_call):
@@ -39,12 +38,14 @@ class FitbitActivitiesTestCase(WorkoutManagerTestCase):
         mock_response.status_code = 200
         mock_api_call.return_value = mock_response
 
+        user = auth.get_user(self.client)
         user_token = TokenManager(
             refresh_token='refresh_token',
             access_token='access_token',
-            user=self.user,
+            user=user,
             has_fitbit_integration=True
         )
+
         user_token.save()
         response = self.client.get(
             self.SITE_URL + reverse('fitbit:activities'))
