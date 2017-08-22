@@ -66,9 +66,12 @@ class Fitbit():
                             (response['errors'][0]['errorType'],
                              response['errors'][0]['message']))
 
-        user_token = user.tokenmanager
-        if not user_token:
-            # Save token data to the database
+        if hasattr(user, 'tokenmanager'):
+            user_token = user.tokenmanager
+            user_token.refresh_token = response['refresh_token']
+            user_token.access_token = response['access_token']
+            user_token.save()
+        else:
             user_token = TokenManager(
                 refresh_token=response['refresh_token'],
                 access_token=response['access_token'],
@@ -76,11 +79,6 @@ class Fitbit():
                 has_fitbit_integration=True
             )
             user_token.save()
-            return
-
-        user_token.refresh_token = response['refresh_token']
-        user_token.access_token = response['access_token']
-        user_token.save()
 
     # Get new tokens based if authentication token is expired
     def ref_access_token(self, token):
