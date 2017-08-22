@@ -33,7 +33,7 @@ from wger.manager.models import WorkoutLog
 logger = logging.getLogger(__name__)
 
 
-def parse_weight_csv(request, cleaned_data):
+def parse_weight_csv(request, cleaned_data):  # pragma: no cover
 
     try:
         dialect = csv.Sniffer().sniff(cleaned_data['csv_input'])
