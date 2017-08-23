@@ -23,6 +23,7 @@ from wger.exercises.models import (
     Equipment,
     ExerciseComment
 )
+from wger.core.api.serializers import LicenseSerializer, LanguageSerializer
 
 
 class ExerciseSerializer(serializers.ModelSerializer):
@@ -71,3 +72,23 @@ class MuscleSerializer(serializers.ModelSerializer):
     '''
     class Meta:
         model = Muscle
+
+
+class DetailedExerciseSerializer(serializers.ModelSerializer):
+    '''
+    Exercises with detail
+    '''
+    equipment = EquipmentSerializer(many=True)
+    muscles, muscles_secondary = MuscleSerializer(
+        many=True), MuscleSerializer(many=True)
+    images = serializers.SerializerMethodField('get_exercise_images')
+    category = ExerciseCategorySerializer()
+    license = LicenseSerializer()
+    language = LanguageSerializer()
+
+    def get_exercise_images(self, obj):
+        img_query = ExerciseImage.objects.filter(exercise_id=obj.id).all()
+        return ExerciseSerializer(instance=img_query, many=True).data
+
+    class Meta:
+        model = Exercise

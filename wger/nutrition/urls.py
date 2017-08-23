@@ -53,7 +53,8 @@ patterns_plan = [
     url(r'^(?P<pk>\d+)/edit/$',
         login_required(plan.PlanEditView.as_view()),
         name='edit'),
-    url(r'^(?P<id>\d+)/pdf/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
+    url(r'^(?P<id>\d+)/pdf/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>'
+        r'[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
         plan.export_pdf,
         name='export-pdf'),
     url(r'^(?P<id>\d+)/pdf/$',
@@ -81,6 +82,9 @@ patterns_meal_item = [
     url(r'^(?P<meal_id>\d+)/item/add/$',
         login_required(meal_item.MealItemCreateView.as_view()),
         name='add'),
+    url(r'^(?P<plan_pk>\d+)/new-meal/add/$',
+        login_required(meal_item.MealItemCreateView.as_view()),
+        name='add-new-meal'),
     url(r'^(?P<pk>\d+)/edit/$',
         login_required(meal_item.MealItemEditView.as_view()),
         name='edit'),
@@ -182,12 +186,14 @@ patterns_calories = [
 
 
 urlpatterns = [
-   url(r'^', include(patterns_plan, namespace="plan")),
-   url(r'^meal/', include(patterns_meal, namespace="meal")),
-   url(r'^meal/item/', include(patterns_meal_item, namespace="meal_item")),
-   url(r'^ingredient/', include(patterns_ingredient, namespace="ingredient")),
-   url(r'^unit/', include(patterns_weight_unit, namespace="weight_unit")),
-   url(r'^unit-to-ingredient/', include(patterns_unit_ingredient, namespace="unit_ingredient")),
-   url(r'^calculator/bmi/', include(patterns_bmi, namespace="bmi")),
-   url(r'^calculator/calories/', include(patterns_calories, namespace="calories")),
+    url(r'^', include(patterns_plan, namespace="plan")),
+    url(r'^meal/', include(patterns_meal, namespace="meal")),
+    url(r'^meal/item/', include(patterns_meal_item, namespace="meal_item")),
+    url(r'^ingredient/', include(patterns_ingredient, namespace="ingredient")),
+    url(r'^unit/', include(patterns_weight_unit, namespace="weight_unit")),
+    url(r'^unit-to-ingredient/', include(patterns_unit_ingredient,
+                                         namespace="unit_ingredient")),
+    url(r'^calculator/bmi/', include(patterns_bmi, namespace="bmi")),
+    url(r'^calculator/calories/', include(patterns_calories,
+                                          namespace="calories")),
 ]

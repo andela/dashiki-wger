@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'whitenoise.runserver_nostatic',
 
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
@@ -112,6 +113,9 @@ MIDDLEWARE_CLASSES = (
 
     # Javascript Header. Sends helper headers for AJAX
     'wger.utils.middleware.JavascriptAJAXRedirectionMiddleware',
+
+    # 'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 
     # Custom authentication middleware. Creates users on-the-fly for certain paths
     'wger.utils.middleware.WgerAuthenticationMiddleware',
@@ -310,8 +314,11 @@ THUMBNAIL_ALIASES = {
 #
 # Django compressor
 #
-STATIC_ROOT = ''
+
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static-collected')
+BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'components')
 
 # The default is not DEBUG, override if needed
 # COMPRESS_ENABLED = True
@@ -320,12 +327,6 @@ COMPRESS_CSS_FILTERS = (
     'compressor.filters.cssmin.rCSSMinFilter'
 )
 COMPRESS_ROOT = STATIC_ROOT
-
-# BOWER binary
-if sys.platform.startswith('win32'):
-    BOWER_PATH = os.path.join('node_modules', '.bin', 'bower.cmd')
-else:
-    BOWER_PATH = os.path.join('node_modules', '.bin', 'bower')
 
 #
 # Django Rest Framework
