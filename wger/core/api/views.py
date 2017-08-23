@@ -16,9 +16,11 @@
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.contrib.auth.models import User
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
+
+from json import loads
 
 from wger.core.models import (
     UserProfile,
@@ -33,10 +35,39 @@ from wger.core.api.serializers import (
     DaysOfWeekSerializer,
     LicenseSerializer,
     RepetitionUnitSerializer,
-    WeightUnitSerializer
+    WeightUnitSerializer,
+    UserCreationSerializer
 )
 from wger.core.api.serializers import UserprofileSerializer
 from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    '''
+    API endpoint for creating users
+    '''
+    is_private = True
+    serializer_class = UserCreationSerializer
+    queryset = User.objects.all()
+
+    def create(self, request):
+
+        profile = UserProfile.objects.get(user=self.request.user)
+        if profile.can_create_via_api:
+            creator = profile.user.username
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                api_user = User.objects.create_user(
+                    username=serializer.validated_data['username'],
+                    email=serializer.validated_data['email'],
+                    password=serializer.validated_data['password'])
+
+                api_user.save()
+                api_user_profile = UserProfile.objects.get(user=api_user)
+                api_user_profile.app_flag = creator
+                api_user_profile.save()
+                return Response(serializer.data, status.HTTP_201_CREATED)
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
