@@ -123,6 +123,16 @@ class UserProfile(models.Model):
     Flag to mark a temporary user (demo account)
     '''
 
+    can_create_via_api = models.BooleanField(default=False, editable=False)
+    '''
+    Shows whether the app was created via the api or not
+    '''
+
+    app_flag = models.CharField(default=None, null=True, max_length=255)
+    '''
+    Flag to indicate which app created the user
+    '''
+
     #
     # User preferences
     #
@@ -179,17 +189,16 @@ make the search difficult.'''),
     send users an email once per week
     '''
 
-    notification_language = models.ForeignKey(
-        Language,
-        verbose_name=_(
-            'Notification language'),
-        help_text=_(
-            'Language to use '
-            'when sending you email '
-            'notifications, e.g. email reminders for '
-            'workouts. This does not affect the '
-            'language used on the website.'),
-        default=2)
+    notification_language = models.ForeignKey(Language,
+                                              verbose_name=_(
+                                                  'Notification language'),
+                                              help_text=_(
+                                                  'Language to use '
+                                                  'when sending you email '
+                                                  'notifications, e.g. email reminders for '
+                                                  'workouts. This does not affect the '
+                                                  'language used on the website.'),
+                                              default=2)
 
     timer_active = models.BooleanField(verbose_name=_(
         'Use pauses in workout timer'),
@@ -307,6 +316,7 @@ make the search difficult.'''),
         null=True,
         validators=[MinValueValidator(
             1500), MaxValueValidator(5000)])
+
     '''Basic caloric intake based on physical activity'''
 
     #

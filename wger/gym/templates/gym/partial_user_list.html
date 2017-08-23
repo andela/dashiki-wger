@@ -15,11 +15,23 @@ $(document).ready( function () {
 </script>
 
 {% if not show_gym %}
+    <script>
+        function compareMembers() {
+            var selected = [];
+            var new_url = "";
+            $("input:checkbox[name=selected_member]:checked").each(function(){
+                selected.push($(this).val());
+            });
+            new_url = selected.join('-or-');
+            window.location = "{% url 'gym:gym:compare' pk=gym_id %}" + new_url;
+        }
+    </script>
     {% if active %}
         <a href="{% url 'gym:gym:user-list-inactive' gym_id %}" class="btn btn-default btn-sm">Inactive Users</a>
     {% else %}
         <a href="{% url 'gym:gym:user-list' gym_id %}" class="btn btn-default btn-sm">Active Users</a>
     {% endif %}
+    <a onclick="compareMembers()" class="btn btn-default btn-sm">Compare</a>
 {% endif %}
 
 <table class="table table-hover" id="main_member_list">
@@ -56,6 +68,9 @@ $(document).ready( function () {
         {% endif %}
     </td>
     {% endif %}
+    <td>
+        <input type="checkbox" name="selected_member" value="{{ current_user.obj.id }}"/>
+    </td>
 </tr>
 {% endfor %}
 </tbody>
