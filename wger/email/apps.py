@@ -18,7 +18,7 @@ from django.apps import AppConfig
 
 
 class Config(AppConfig):
-    name = "wger.email"
+    name = 'wger.email'
     verbose_name = "Email"
 
     def ready(self):

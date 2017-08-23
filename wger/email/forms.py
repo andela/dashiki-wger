@@ -24,12 +24,9 @@ from django.forms import (
 
 
 class EmailListForm(Form):
-    """
+    '''
     Small form to send emails
-    """
+    '''
 
     subject = CharField(label=pgettext('As in "email subject"', 'Subject'))
-    body = CharField(
-        widget=Textarea,
-        label=pgettext('As in "content of an email"', 'Content')
-    )
+    body = CharField(widget=Textarea, label=pgettext('As in "content of an email"', 'Content'))

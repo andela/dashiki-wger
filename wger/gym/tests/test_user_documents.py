@@ -14,8 +14,7 @@
 
 from django.core.urlresolvers import reverse
 
-from wger.core.tests.base_testcase import WorkoutManagerAccessTestCase
-from wger.core.tests.base_testcase import delete_testcase_add_methods
+from wger.core.tests.base_testcase import WorkoutManagerAccessTestCase, delete_testcase_add_methods
 from wger.core.tests.base_testcase import WorkoutManagerAddTestCase
 from wger.core.tests.base_testcase import WorkoutManagerDeleteTestCase
 from wger.core.tests.base_testcase import WorkoutManagerEditTestCase
@@ -23,9 +22,9 @@ from wger.gym.models import UserDocument
 
 
 class UserDocumentOverviewTest(WorkoutManagerAccessTestCase):
-    """
+    '''
     Tests accessing the user document overview page
-    """
+    '''
     url = reverse('gym:document:list', kwargs={'user_pk': 14})
     anonymous_fail = True
     user_success = ('trainer1',
@@ -40,9 +39,9 @@ class UserDocumentOverviewTest(WorkoutManagerAccessTestCase):
 
 
 class AddDocumentTestCase(WorkoutManagerAddTestCase):
-    """
+    '''
     Tests uploading a new user document
-    """
+    '''
 
     object_class = UserDocument
     url = reverse('gym:document:add', kwargs={'user_pk': 14})
@@ -60,9 +59,9 @@ class AddDocumentTestCase(WorkoutManagerAddTestCase):
 
 
 class EditDocumentTestCase(WorkoutManagerEditTestCase):
-    """
+    '''
     Tests editing a user document
-    """
+    '''
 
     pk = 2
     object_class = UserDocument
@@ -79,9 +78,9 @@ class EditDocumentTestCase(WorkoutManagerEditTestCase):
 
 
 class DeleteDocumentTestCase(WorkoutManagerDeleteTestCase):
-    """
+    '''
     Tests deleting a user document
-    """
+    '''
 
     pk = 1
     object_class = UserDocument
@@ -95,6 +94,5 @@ class DeleteDocumentTestCase(WorkoutManagerDeleteTestCase):
                  'trainer4',
                  'manager3',
                  'general_manager1')
-
 
 delete_testcase_add_methods(DeleteDocumentTestCase)
