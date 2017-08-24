@@ -30,15 +30,15 @@ from django.http.response import (
     HttpResponse,
     HttpResponseRedirect
 )
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django.views.generic import (
     ListView,
     DeleteView,
     CreateView,
-    UpdateView
-)
+    UpdateView,
+    DetailView, View)
 
 from wger.gym.forms import GymUserAddForm, GymUserPermisssionForm
 from wger.gym.helpers import (
@@ -48,15 +48,17 @@ from wger.gym.helpers import (
 from wger.gym.models import (
     Gym,
     GymAdminConfig,
-    GymUserConfig
-)
+    GymUserConfig,
+    AdminUserNote, Contract)
 from wger.config.models import GymConfig as GlobalGymConfig
+from wger.manager.models import Workout, WorkoutLog, WorkoutSession
+from wger.nutrition.models import NutritionPlan
 from wger.utils.generic_views import (
     WgerFormMixin,
     WgerDeleteMixin,
     WgerMultiplePermissionRequiredMixin)
 from wger.utils.helpers import password_generator
-
+from wger.weight.models import WeightEntry
 
 logger = logging.getLogger(__name__)
 
@@ -77,9 +79,74 @@ class GymListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context['global_gym_config'] = GlobalGymConfig.objects.all().first()
         return context
 
+      
+class GymUserCompare(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, DetailView):
+    """
+    Comparision of two or more gym members
+    """
+    model = User
+    permission_required = ('gym.manage_gym', 'gym.manage_gyms', 'gym.gym_trainer')
+    template_name = 'gym/compare_members.html'
+    context_object_name = 'current_user'
+    user_ids = []
+    users = []
 
-class GymUserListView(LoginRequiredMixin,
-                      WgerMultiplePermissionRequiredMixin, ListView):
+    def dispatch(self, request, *args, **kwargs):
+        '''
+        Check permissions
+
+        - Only managers for this gym can access the members
+        - General managers can access the detail page of all users
+        '''
+        current_user = request.user
+
+        if not current_user.is_authenticated():
+            return HttpResponseForbidden()
+
+        if (current_user.has_perm('gym.manage_gym') or current_user.has_perm('gym.gym_trainer')) \
+                and not current_user.has_perm('gym.manage_gyms'):
+            return HttpResponseForbidden()
+
+        return super(GymUserCompare, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        '''
+        Send some additional data to the template
+        '''
+
+        self.user_ids = self.kwargs['user_list'].split('-or-')
+        self.users = [User.objects.get(pk=user_id) for user_id in self.user_ids]
+        context = super(GymUserCompare, self).get_context_data(**kwargs)
+        workouts = {user: Workout.objects.filter(user=user.id).all()
+                    for user in self.users}
+
+        for (user, workouts) in workouts.items():
+            out = []
+            for workout in workouts:
+                logs = WorkoutLog.objects.filter(workout=workout)
+                out.append({'workout': workout,
+                            'logs': logs.dates('date', 'day').count(),
+                            'last_log': logs.last()})
+
+            context['workouts'] = {user: out}
+
+        weight_entries = {user: WeightEntry.objects.filter(user=user).order_by('-date')[:5]
+                          for user in self.users}
+        context['weight_entries'] = weight_entries
+        nutritional_plans = {
+            user: NutritionPlan.objects.filter(user=user).order_by('creation_date')[:5]
+            for user in self.users
+        }
+        context['nutrition_plans'] = nutritional_plans
+        session = {user: WeightEntry.objects.filter(user=user).order_by('-date')[:10]
+                   for user in self.users}
+        context['session'] = session
+        context['users'] = '-or-'.join([user.username for user in self.users])
+        print("Getting context")
+        return context
+
+
+class GymUserListView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, ListView):
     """
     Overview of all users for a specific gym
     """
@@ -87,6 +154,7 @@ class GymUserListView(LoginRequiredMixin,
     permission_required = ('gym.manage_gym',
                            'gym.gym_trainer',
                            'gym.manage_gyms')
+    active = True
     template_name = 'gym/member_list.html'
 
     def dispatch(self, request, *args, **kwargs):
@@ -107,9 +175,9 @@ class GymUserListView(LoginRequiredMixin,
         """
         out = {'admins': [],
                'members': []}
-
-        for u in Gym.objects.get_members(self.kwargs['pk']).\
-                select_related('usercache'):
+        
+        for u in Gym.objects.get_members(self.kwargs['pk'],
+                                         active=self.active).select_related('usercache'):
             out['members'].append({'obj': u,
                                    'last_log': u.usercache.last_activity})
 
@@ -130,10 +198,12 @@ class GymUserListView(LoginRequiredMixin,
         """
         context = super(GymUserListView, self).get_context_data(**kwargs)
         context['gym'] = Gym.objects.get(pk=self.kwargs['pk'])
+        context['gym_id'] = self.kwargs['pk']
+        context['active'] = self.active
         context['admin_count'] = len(context['object_list']['admins'])
         context['user_count'] = len(context['object_list']['members'])
-        context['user_table'] = {
-            'keys': [_('ID'), _('Username'), _('Name'), _('Last activity')],
+        context['user_table'] = {'keys': [
+            _('ID'), _('Username'), _('Name'), _('Last activity'), _('Compare')],
             'users': context['object_list']['members']}
         return context
 
@@ -154,7 +224,7 @@ class GymAddView(WgerFormMixin,
 
 
 @login_required
-def gym_new_user_info(request):
+def gym_new_user_info(request):  # pragma: no cover
     """
     Shows info about a newly created user
     """
@@ -220,7 +290,7 @@ def gym_new_user_info_export(request):
     return response
 
 
-def reset_user_password(request, user_pk):
+def reset_user_password(request, user_pk):  # pragma: no cover
     """
     Resets the password of the selected user to random password
     """
@@ -247,7 +317,7 @@ def reset_user_password(request, user_pk):
     return render(request, 'gym/reset_user_password.html', context)
 
 
-def gym_permissions_user_edit(request, user_pk):
+def gym_permissions_user_edit(request, user_pk):  # pragma: no cover
     """
     Edits the permissions of a gym member
     """

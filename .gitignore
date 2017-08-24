@@ -45,8 +45,8 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
 settings*.py
+*.log
 *.sqlite
 /CACHE
 
@@ -61,7 +61,12 @@ target/
 
 # External Libraries
 wger/core/static/bower_components
+wger/components/wger/core/static/bower_components
 node_modules
 
 wger-venv/
 package-lock.json
+**/migrations/*
+*.swp
+
+test.txt

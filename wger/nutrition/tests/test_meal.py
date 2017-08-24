@@ -23,7 +23,7 @@ from wger.core.tests.base_testcase import (
     WorkoutManagerEditTestCase,
     WorkoutManagerAddTestCase
 )
-from wger.nutrition.models import Meal
+from wger.nutrition.models import Meal, MealItem
 from wger.nutrition.models import NutritionPlan
 
 
@@ -62,6 +62,30 @@ class AddMealTestCase(WorkoutManagerAddTestCase):
     user_fail = 'admin'
 
 
+class AddNewMealTestCase(WorkoutManagerTestCase):
+    '''
+    Tests adding a new meal and item simultaneously
+    '''
+
+    def test_add_new_meal(self):
+        self.user_login('admin')
+        url = reverse('nutrition:meal_item:add-new-meal',
+                      kwargs={'plan_pk': 5})
+        data = {'amount': 1,
+                'ingredient': 1,
+                'weight_unit': 1,
+                'time': datetime.time(7, 2)}
+
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get(reverse('nutrition:plan:view', kwargs={'id': 5}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '07:02')
+
+        self.user_logout()
+
+
 class PlanOverviewTestCase(WorkoutManagerTestCase):
     '''
     Tests the nutrition plan overview
@@ -96,7 +120,8 @@ class PlanDetailTestCase(WorkoutManagerTestCase):
         Helper function to test the plan detail view
         '''
 
-        response = self.client.get(reverse('nutrition:plan:view', kwargs={'id': 1}))
+        response = self.client.get(reverse('nutrition:plan:view',
+                                           kwargs={'id': 1}))
 
         # Page exists
         if fail:

@@ -50,4 +50,10 @@ urlpatterns = [
     url(r'^api/get_weight_data/$', # JS
         views.get_weight_data,
         name='weight-data'),
+    url(r'^api/get_multiple_weight_data/(?P<user_list>(\w+(\-or\-)?)+)',
+        views.get_multiple_weight_data,
+        name='multiple-weight-data'),
+    url(r'^api/get_nutritional_data/(?P<user_list>(\w+(\-or\-)?)+)$',
+        views.get_nutritional_plans,
+        name='nutritional-plan'),
 ]

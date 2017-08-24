@@ -1,12 +1,16 @@
 {
   "name": "wger",
   "version": "1.8.0",
+  "engines": {
+    "node": "6.11.1"
+  },
   "description": "Self hosted FLOSS fitness/workout and weight tracker",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "bower install"
   },
   "repository": {
     "type": "git",
