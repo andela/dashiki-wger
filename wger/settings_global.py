@@ -16,6 +16,7 @@
 
 import re
 import sys
+import os
 
 '''
 This file contains the global settings that don't usually need to be changed.
@@ -57,6 +58,7 @@ INSTALLED_APPS = (
     'wger.utils',
     'wger.config',
     'wger.gym',
+    'wger.fitbit',
     'wger.email',
 
     # reCaptcha support, see https://github.com/praekelt/django-recaptcha
@@ -371,3 +373,8 @@ WGER_SETTINGS = {
     'EMAIL_FROM': 'wger Workout Manager <wger@example.com>',
     'TWITTER': False
 }
+
+# Fitbit settings
+CLIENT_ID = os.environ.get('CLIENT_ID', 'FakeClientId')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET', 'FakeClientSecret')
+REDIRECT_URI = os.environ.get('REDIRECT_URI', 'FakeRedirectUrl')

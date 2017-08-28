@@ -62,7 +62,6 @@ script:
   # Regular application
   - coverage run --source='.' ./manage.py test --parallel
 
-
   # Code coverage
   - coverage report
 
