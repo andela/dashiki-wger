@@ -124,3 +124,27 @@ class RegistrationTestCase(WorkoutManagerTestCase):
             count_after = User.objects.count()
             self.assertEqual(response.status_code, 302)
             self.assertEqual(count_before, count_after)
+
+    def test_oauth_registration_successfully(self):
+        payload = {
+            'id': 183838388383,
+            'name': 'Awesome name',
+            'email': 'mail@andela.com'
+        }
+        response = self.client.post(
+            reverse('core:user:oauth_registration'), payload)
+        self.assertEqual(response.status_code, 200)
+        # test for success message
+        self.assertTrue("success" in response.content.decode().lower())
+
+    def test_oauth_registration_user(self):
+        count_before = User.objects.count()
+        # payload with dummy api data
+        payload = {
+            'id': 7737636,
+            'name': 'Awesome name',
+            'email': 'mail@andela.com'
+        }
+        self.client.post(reverse('core:user:oauth_registration'), payload)
+        count_after = User.objects.count()
+        self.assertEqual(count_after - count_before, 1)

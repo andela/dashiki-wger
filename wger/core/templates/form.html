@@ -25,46 +25,13 @@
     {% render_form_fields form submit_text %}
 </form>
 
-<!-- social login block -->
-<div class="row-fluid" style="float:right">
-    <div id="my-signin2"></div>
-    <script>
-function onSuccess(googleUser) {
-    let $uri= "/en/user/oauth_register";
-    payload = {
-        id: googleUser.getBasicProfile().getId(),
-        name: googleUser.getBasicProfile().getName(),
-        email: googleUser.getBasicProfile().getEmail()
-    }
-
-    $.post($uri, payload).done(function($data){
-        if ($data){
-            alert($data)
-        }
-    }).error(function(err){
-        console.log(err)
-    })
-}
-function onFailure(error) {
-    console.log(error);
-}
-function renderButton() {
-    gapi.signin2.render('my-signin2', {
-        'scope': 'profile email',
-        'width': 240,
-        'height': 50,
-        'longtitle': true,
-        'theme': 'dark',
-        'onsuccess': onSuccess,
-        'onfailure': onFailure
-    });
-}
-    </script>
-</div>
 {% endblock %}
 
 
 <!--
     Side bar
 -->
-{% block sidebar %}{% if sidebar %}{% include sidebar %}{% endif %}{% endblock %}
+{% block sidebar %}
+<p style="text-align:right"><strong>-------------- or ---------------</strong></p>
+{% include 'user/social.html'%}
+{% if sidebar %}{% include sidebar %}{% endif %}{% endblock %}
