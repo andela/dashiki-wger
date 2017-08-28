@@ -115,6 +115,24 @@
                         {% endif %}
 
 
+                        {#               #}
+                        {# Fitbit tab #}
+                        {#               #}
+                        {% if user.is_authenticated %}
+                        <li class="dropdown {% if active_tab == 'fitbit' %}active{% endif %}">
+                            <a href="#"
+                               class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               rel="nofollow">{% trans "Fitbit" %} <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'fitbit:weights' %}" rel="nofollow">{% trans "Weights" %}</a></li>
+                                <li><a href="{% url 'fitbit:activities' %}" rel="nofollow">{% trans "Activities" %}</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+
+
+
                         {#              #}
                         {# Software tab #}
                         {#              #}

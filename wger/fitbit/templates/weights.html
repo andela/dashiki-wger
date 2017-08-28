@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load filters %}
+{% load i18n staticfiles wger_extras django_bootstrap_breadcrumbs %}
+
+{% block title %}{% trans "Weights from your fitbit account" %}{% endblock %}
+
+{#        #}
+{# Header #}
+{#        #}
+{% block header %}
+<script src="{% static 'js/fitbit_weight.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="weight_diagram"></div>
+<div class="list-group">
+    <table class="table">
+        <tr>
+            <th>{% trans 'Date' %}</th>
+            <th>{% trans 'Weight' %}</th>
+        </tr>
+        {% for weight in weights|get:"body-weight" %}
+            <tr>
+                <td>{{ weight|get:"dateTime" }}</td>
+                <td>{{ weight|get:"value" }}</td>
+            </tr>
+        {% empty %}
+            <li class="list-group-item">
+                {% trans "Nothing found" %}
+            </li>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
+
+
+
