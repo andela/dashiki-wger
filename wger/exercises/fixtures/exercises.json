@@ -1711,7 +1711,8 @@
             "category": 8,
             "uuid": "48a59aa8-4568-409c-8afe-f8cb99c558ea",
             "muscles": [
-                1
+                1,
+              19
             ],
             "license": 1,
             "name": "Biceps curls with dumbbell"
@@ -3935,7 +3936,8 @@
             "category": 8,
             "uuid": "9d756e84-6b77-4f17-b21d-7d266d6a8bd2",
             "muscles": [
-                5
+                5,
+                17
             ],
             "license": 1,
             "name": "Push ups"
@@ -4731,7 +4733,8 @@
             "category": 13,
             "uuid": "a87de062-2101-4dc4-adda-328b4c722c6d",
             "muscles": [
-                2
+                2,
+                17
             ],
             "license": 1,
             "name": "Front raises"
@@ -5574,7 +5577,8 @@
             "category": 8,
             "uuid": "88568115-5e88-4afc-b005-e2f7d453ac13",
             "muscles": [
-                5
+                5,
+                17
             ],
             "license": 1,
             "name": "Tricep Dumbbell Kickback"
@@ -6307,7 +6311,9 @@
             "creation_date": "2015-03-07",
             "category": 8,
             "uuid": "1ec5352f-41da-408b-8e6c-3fef79475847",
-            "muscles": [],
+            "muscles": [
+              20
+            ],
             "license": 2,
             "name": "Hand Grip"
         },
@@ -6653,7 +6659,10 @@
             "category": 8,
             "uuid": "4e15a410-5530-4b86-964f-8af26e118e2b",
             "muscles": [
-                5
+                5,
+                17,
+                19,
+                20
             ],
             "license": 2,
             "name": "Body-Ups"
@@ -6747,7 +6756,9 @@
             "creation_date": "2015-08-03",
             "category": 10,
             "uuid": "c788d643-150a-4ac7-97ef-84643c6419bf",
-            "muscles": [],
+            "muscles": [
+                20
+            ],
             "license": 2,
             "name": "2 Handed Kettlebell swing"
         },
