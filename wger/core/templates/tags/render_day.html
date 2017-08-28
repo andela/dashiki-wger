@@ -135,6 +135,9 @@ $(document).ready(function() {
             <td colspan="2">
                 <a href="{% url 'manager:set:add' day.obj.id %}"
                    class="wger-modal-dialog">{% trans "Add exercises to this workout day" %}</a>
+                <span> | </span>
+                <a href="{% url 'manager:set:dropset' day.obj.id %}"
+                    class="wger-modal-dialog">{% trans " Add dropset excercises to this workout day" %}</a>
             </td>
         </tr>
         {% endif %}

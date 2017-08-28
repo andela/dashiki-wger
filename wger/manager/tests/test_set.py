@@ -139,6 +139,54 @@ class SetAddTestCase(WorkoutManagerAddTestCase):
             else:
                 self.assertIn(setting.reps, (8, 10))
 
+    def test_add_dropset(self, fail=False):
+        '''
+        Tests adding a dropset and corresponding settings at
+        the same time
+        '''
+
+        # POST the data
+        self.user_login('test')
+        exercises_id = [1, 2]
+        post_data = {'exercises': exercises_id,
+                     'exercise_list': 1,  # Only for mobile version
+                     'sets': 4,
+
+                     'exercise1-TOTAL_FORMS': 4,
+                     'exercise1-INITIAL_FORMS': 0,
+                     'exercise1-MAX_NUM_FORMS': 1000,
+                     'exercise1-0-reps': 10,
+                     'exercise1-0-repetition_unit': 1,
+                     'exercise1-0-weight_unit': 1,
+                     'exercise1-1-reps': 12,
+                     'exercise1-1-repetition_unit': 1,
+                     'exercise1-1-weight_unit': 1,
+                     'exercise1-2-reps': 10,
+                     'exercise1-2-repetition_unit': 1,
+                     'exercise1-2-weight_unit': 1,
+                     'exercise1-3-reps': 12,
+                     'exercise1-3-repetition_unit': 1,
+                     'exercise1-3-weight_unit': 1,
+
+                     'exercise2-TOTAL_FORMS': 4,
+                     'exercise2-INITIAL_FORMS': 0,
+                     'exercise2-MAX_NUM_FORMS': 1000,
+                     'exercise2-0-reps': 8,
+                     'exercise2-0-repetition_unit': 1,
+                     'exercise2-0-weight_unit': 1,
+                     'exercise2-1-reps': 10,
+                     'exercise2-1-repetition_unit': 2,
+                     'exercise2-1-weight_unit': 2,
+                     'exercise2-2-reps': 8,
+                     'exercise2-2-repetition_unit': 1,
+                     'exercise2-2-weight_unit': 1,
+                     'exercise2-3-reps': 10,
+                     'exercise2-3-repetition_unit': 2,
+                     'exercise2-3-weight_unit': 2}
+        response = self.client.post(
+            reverse('manager:set:dropset', kwargs={'day_pk': 5}), post_data)
+        self.assertEqual(response.status_code, 302)
+
 
 class SetDeleteTestCase(WorkoutManagerTestCase):
     '''

@@ -1,0 +1,77 @@
+{% extends extend_template %}
+{% load i18n %}
+{% load staticfiles %}
+{% load wger_extras %}
+
+
+<!--
+        Title
+-->
+
+{% block title %}{% with day_name=day.description %}{% blocktrans %}Add exercises to day "{{day_name}}"{% endblocktrans %}{% endwith %}{% endblock %}
+
+
+<!--
+        Header
+-->
+{% block header %}
+<script>
+function wgerCustomPageInit()
+{
+    wgerInitEditSet();
+}
+</script>
+{% endblock %}
+
+<!--
+        Main Content
+-->
+{% block content %}
+
+
+<form action="{{form_action}}"
+      method="post"
+      class="form-horizontal">
+
+    {% csrf_token %}
+    {% render_form_field form.exercises %}
+    <div class="form-group">
+        <label for="id_sets" class="control-label col-md-3">
+            {{form.sets.label}}:
+            <span id="id_sets_value">{{ form.sets.value }}</span>
+        </label>
+        <div class="col-md-9">
+            <input name="sets"
+                   id="id_sets"
+                   min="1"
+                   max="10"
+                   value="{{ form.sets.value }}"
+                   type="range"
+                   class="form-control">
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="col-md-3 control-label">
+            {% trans "Repetitions" %}
+        </label>
+        <div class=" col-md-9">
+        <span class="help-block">{% blocktrans %}Drop sets are essentially a technique where you perform an exercise and then drop 
+            (reduce) the weight and continue for more reps until you reach failure.{% endblocktrans %}</span>
+        </div>
+    </div>
+    <div class="form-group">
+    <div class="col-md-12">
+        <div id="formsets">
+        {% for formset in formsets %}
+                {% include 'set/dropsetset.html' with exercise=formset.exercise formset=formset.formset %}
+        {% endfor %}
+        </div>
+    </div>
+    </div>
+
+
+    {% render_form_submit %}
+</form>
+{% endblock %}
