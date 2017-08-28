@@ -1,0 +1,108 @@
+<!-- social login block -->
+<div class="row-fluid">
+    <!-- FB sdk -->
+    <script>
+window.fbAsyncInit = function() {
+    FB.init({
+        appId      : '148536332393805',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v2.8'
+    });
+    FB.AppEvents.logPageView();
+};
+
+(function(d, s, id){
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+    </script>
+
+
+    <div class="col-md-3" style="float: none;margin: 0 auto">
+        <form id="csrf_form" method="post" action="#">
+            {% csrf_token %}
+        </form>
+        <div class="form-group">
+            <div id="my-signin2"></div>
+        </div>
+        <div class="form-group">
+            <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="login_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onlogin="fbLogin()"></div>
+        </div>
+
+    </div>
+    <script type="text/ecmascript"> 
+function postPayload(payload, type=false){
+    let $uri= "/en/user/oauth_registration";
+    let $formData = $('#csrf_form').serialize()+`&id=${payload['id']}&name=${payload['name']}&email=${payload['email']}`
+
+    $.post($uri, $formData).done(function($data){
+        if ($data == 'success'){
+            // destroy if google instance
+            if (type == 'google'){
+                let auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function(){
+                    window.location.replace('/');
+                })
+            }else{
+                window.location.replace('/');
+            }
+        }else{
+            alert($data)
+        }
+    }).error(function(err){
+        console.log(err)
+    })
+
+}
+function fbLogin(){
+    FB.getLoginStatus(function(response){
+        // Get get user profile if logged in 
+        $uri = 'https://graph.facebook.com/?fields=id,name,email&id='.concat(response['authResponse']['userID']).
+        concat('&access_token=').concat(response['authResponse']['accessToken']);
+        $.get($uri).done(function($data){
+            try{
+                payload = {
+                    id: $data['id'],
+                    name: $data['name'],
+                    // replace spaces in username with period and user as email or username
+                    email: $data['name'].toLowerCase().split(' ').join('.').concat('@facebook.com')
+                }
+                postPayload(payload)
+
+            }catch(ex){
+                console.log(ex)
+            }
+        }).error(function(err){
+
+        });
+    });
+}
+function onSuccess(googleUser) {
+        payload = {
+         id: googleUser.getBasicProfile().getId(),
+         name: googleUser.getBasicProfile().getName(),
+         email: googleUser.getBasicProfile().getEmail()
+        }
+        postPayload(payload, 'google')
+  }
+function onFailure(error) {
+    console.log(error);
+}
+function renderButton() {
+    gapi.signin2.render('my-signin2', {
+        'scope': 'profile email',
+        'width': 240,
+        'height': 50,
+        'longtitle': true,
+        'theme': 'dark',
+        'onsuccess': onSuccess,
+        'onfailure': onFailure
+    });
+}
+    </script>
+</div>
+

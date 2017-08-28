@@ -228,3 +228,31 @@ class UserDetailPageTestCase2(WorkoutManagerAccessTestCase):
                  'manager1',
                  'member1',
                  'member2')
+
+
+class OauthUserLoginTestCase(WorkoutManagerTestCase):
+
+    def test_oauth_login_successfully(self):
+        initial_count = User.objects.count()
+        payload = {
+            'id': 222222,
+            'name': 'Colllins Andela',
+            'email': 'collins@andela.com'
+        }
+        # first create user
+        register = self.client.post(
+            reverse('core:user:oauth_registration'), payload)
+        self.assertTrue(register.status_code, 200)
+
+        # note the user increase
+        reg_user_increase = User.objects.count() - initial_count
+
+        # we now use the same registration link or login
+        login = self.client.post(
+            reverse('core:user:oauth_registration'), payload)
+        self.assertTrue(login.status_code, 200)
+
+        # but notice that user cout remains the same, so no user
+        # was created but current was logged in
+        self.assertTrue(User.objects.count() -
+                        reg_user_increase, initial_count)

@@ -22,7 +22,9 @@ from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.utils import translation
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import (
+    PermissionRequiredMixin, LoginRequiredMixin
+)
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
@@ -40,7 +42,9 @@ from django.conf import settings
 from rest_framework.authtoken.models import Token
 
 from wger.utils.constants import USER_TAB
-from wger.utils.generic_views import WgerFormMixin, WgerMultiplePermissionRequiredMixin
+from wger.utils.generic_views import (
+    WgerFormMixin, WgerMultiplePermissionRequiredMixin
+)
 from wger.utils.user_agents import check_request_amazon, check_request_android
 from wger.core.forms import (
     UserPreferencesForm,
@@ -63,8 +67,36 @@ from wger.gym.models import (
     GymUserConfig,
     Contract
 )
+from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
+
+
+class Static:
+
+    @staticmethod
+    def make_profile(user, username, password, request):
+        # Pre-set some values of the user's profile
+        language = Language.objects.get(short_name=translation.get_language())
+        user.userprofile.notification_language = language
+
+        # Set default gym, if needed
+        gym_config = GymConfig.objects.get(pk=1)
+        if gym_config.default_gym:
+            user.userprofile.gym = gym_config.default_gym
+
+            # Create gym user configuration object
+            config = GymUserConfig()
+            config.gym = gym_config.default_gym
+            config.user = user
+            config.save()
+
+        user.userprofile.save()
+
+        user = authenticate(username=username, password=password)
+        django_login(request, user)
+        messages.success(request, _('You were successfully registered'))
+        return HttpResponseRedirect(reverse('core:dashboard'))
 
 
 def login(request):
@@ -85,11 +117,11 @@ def login(request):
 @login_required()
 def delete(request, user_pk=None):
     '''
-    Delete a user account and all his data,
-    requires password confirmation first
+    Delete a user account and all his data, requires password confirmation \
+    first
 
-    If no user_pk is present, the user visiting
-    the URL will be deleted, otherwise
+    If no user_pk is present, the user visiting the URL will be deleted, \
+    otherwise
     a gym administrator is deleting a different user
     '''
 
@@ -101,7 +133,8 @@ def delete(request, user_pk=None):
         # gym or is an admin as well. General admins can delete all users.
         if not request.user.has_perm('gym.manage_gyms') \
                 and (not request.user.has_perm('gym.manage_gym')
-                     or request.user.userprofile.gym_id != user.userprofile.gym_id
+                     or request.user.userprofile.gym_id != user.userprofile.
+                     gym_id
                      or user.has_perm('gym.manage_gym')
                      or user.has_perm('gym.gym_trainer')
                      or user.has_perm('gym.manage_gyms')):
@@ -117,17 +150,18 @@ def delete(request, user_pk=None):
         if form.is_valid():
 
             user.delete()
-            messages.success(request,
-                             _(
-                                 'Account "{0}" was successfully deleted').format(user.username))
+            messages.success(
+                request,
+                ('Account "{0}" was successfully deleted').format(
+                    user.username))
 
             if not user_pk:
                 django_logout(request)
                 return HttpResponseRedirect(reverse('software:features'))
             else:
                 gym_pk = request.user.userprofile.gym_id
-                return HttpResponseRedirect(
-                    reverse('gym:gym:user-list', kwargs={'pk': gym_pk}))
+                return HttpResponseRedirect(reverse(
+                    'gym:gym:user-list', kwargs={'pk': gym_pk}))
     context = {'form': form,
                'user_delete': user,
                'form_action': form_action}
@@ -169,8 +203,8 @@ def trainer_login(request, user_pk):
     # Note: it seems we have to manually set the authentication backend here
     # - https://docs.djangoproject.com/en/1.6/topics/auth/default/
     # #auth-web-requests
-    # - http://stackoverflow.com/questions
-    # /3807777/django-login-without-authenticating
+    # - http://stackoverflow.com/questions/3807777/
+    # django-login-without-authenticating
     if own:
         del(request.session['trainer.identity'])
     user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -183,9 +217,9 @@ def trainer_login(request, user_pk):
         else:
             return HttpResponseRedirect(reverse('core:index'))
     else:
-        return HttpResponseRedirect(
-            reverse('gym:gym:user-list',
-                    kwargs={'pk': user.userprofile.gym_id}))
+        return HttpResponseRedirect(reverse(
+            'gym:gym:user-list',
+            kwargs={'pk': user.userprofile.gym_id}))
 
 
 def logout(request):
@@ -220,7 +254,8 @@ def registration(request):
         FormClass = RegistrationFormNoCaptcha
 
     # Redirect regular users, in case they reached the registration page
-    if request.user.is_authenticated() and not request.user.userprofile.is_temporary:
+    if request.user.is_authenticated(
+    ) and not request.user.userprofile.is_temporary:
         return HttpResponseRedirect(reverse('core:dashboard'))
 
     if request.method == 'POST':
@@ -235,29 +270,7 @@ def registration(request):
                                                    email,
                                                    password)
             user.save()
-
-            # Pre-set some values of the user's profile
-            language = Language.objects.get(
-                short_name=translation.get_language())
-            user.userprofile.notification_language = language
-
-            # Set default gym, if needed
-            gym_config = GymConfig.objects.get(pk=1)
-            if gym_config.default_gym:
-                user.userprofile.gym = gym_config.default_gym
-
-                # Create gym user configuration object
-                config = GymUserConfig()
-                config.gym = gym_config.default_gym
-                config.user = user
-                config.save()
-
-            user.userprofile.save()
-
-            user = authenticate(username=username, password=password)
-            django_login(request, user)
-            messages.success(request, _('You were successfully registered'))
-            return HttpResponseRedirect(reverse('core:dashboard'))
+            return Static.make_profile(user, username, password, request)
     else:
         form = FormClass()
 
@@ -269,6 +282,24 @@ def registration(request):
     template_data['extend_template'] = 'base.html'
 
     return render(request, 'form.html', template_data)
+
+
+def oauth_registration(request):
+    if request.method == 'POST':
+        id, email = request.POST['id'], request.POST['email']
+
+        # first check if user exists
+        user_exists = User.objects.filter(username=email).first()
+        if user_exists:
+            user = authenticate(username=email, password=id)
+            django_login(request, user)
+            return HttpResponse("success")
+        else:
+            # else create user with credentials
+            user = Django_User.objects.create_user(email, email, id)
+            user.save()
+            if Static.make_profile(user, email, id, request):
+                return HttpResponse("success")
 
 
 @login_required
@@ -337,9 +368,10 @@ class UserDeactivateView(LoginRequiredMixin,
         if not request.user.is_authenticated():
             return HttpResponseForbidden()
 
-        if (request.user.has_perm(
-            'gym.manage_gym') or request.user.has_perm('gym.gym_trainer')) \
-                and edit_user.userprofile.gym_id != request.user.userprofile.gym_id:
+        if (request.user.has_perm('gym.manage_gym') or
+                request.user.has_perm('gym.gym_trainer')) \
+                and edit_user.userprofile.gym_id != \
+                request.user.userprofile.gym_id:
             return HttpResponseForbidden()
 
         return super(
@@ -374,9 +406,11 @@ class UserActivateView(LoginRequiredMixin,
         if not request.user.is_authenticated():
             return HttpResponseForbidden()
 
-        if (request.user.has_perm(
-            'gym.manage_gym') or request.user.has_perm('gym.gym_trainer')) \
-                and edit_user.userprofile.gym_id != request.user.userprofile.gym_id:
+        if (request.user.has_perm('gym.manage_gym') or request.
+                user.has_perm('gym.gym_trainer')) \
+                and \
+                edit_user.userprofile.gym_id \
+                != request.user.userprofile.gym_id:
             return HttpResponseForbidden()
 
         return super(UserActivateView, self).dispatch(request, *args, **kwargs)
@@ -462,8 +496,8 @@ def api_key(request):
     return render(request, 'user/api_key.html', context)
 
 
-class UserDetailView(LoginRequiredMixin,
-                     WgerMultiplePermissionRequiredMixin, DetailView):
+class UserDetailView(
+        LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, DetailView):
     '''
     User overview for gyms
     '''
@@ -485,8 +519,8 @@ class UserDetailView(LoginRequiredMixin,
         if not user.is_authenticated():
             return HttpResponseForbidden()
 
-        if (user.has_perm(
-            'gym.manage_gym') or user.has_perm('gym.gym_trainer')) \
+        if (user.has_perm('gym.manage_gym') or user.
+                has_perm('gym.gym_trainer')) \
                 and not user.has_perm('gym.manage_gyms') \
                 and user.userprofile.gym != self.get_object().userprofile.gym:
             return HttpResponseForbidden()
