@@ -37,7 +37,7 @@ python-dateutil==2.6.1
 python-mimeparse==1.6.0
 pytz==2017.2
 rcssmin==1.0.6
-reportlab==3.4.0
+reportlab==3.5.55
 requests==2.18.1
 rjsmin==1.0.12
 six==1.10.0
